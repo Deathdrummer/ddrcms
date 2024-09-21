@@ -1,0 +1,50 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
+<metadata>
+Created by FontForge 20170731 at Tue May 17 14:54:35 2016
+ By Aleksey,,,
+Copyright (c) 2016 by Fontfabric LLC. All rights reserved.
+</metadata>
+<defs>
+<font id="Phenomena-Black" horiz-adv-x="500" >
+  <font-face 
+    font-family="Phenomena Black"
+    font-weight="900"
+    font-stretch="normal"
+    units-per-em="1000"
+    panose-1="0 0 10 0 0 0 0 0 0 0"
+    ascent="800"
+    descent="-200"
+    bbox="33 -200 410 800"
+    underline-thickness="50"
+    underline-position="-200"
+    unicode-range="U+0020-0491"
+  />
+<missing-glyph 
+d="M410 800v-1000h-317v1000h317zM333 733h-165v-33h65v-37h-66v-33h166v33h-66v37h66v33zM267 604h-100v-104h166v34h-66v70zM233 570v-36h-33v36h33zM333 473h-166v-33h66v-37h-66v-33h100v70h66v33zM333 413h-33v-66h-133v-34h166v100zM333 291h-100v-56h34v23h33v-47
+h-100v80h-33v-113h166v113zM333 118h-166v-113h166v113zM300 85v-47h-100v47h100zM333 -18h-166v-33h70l-70 -47v-33h166v33h-102l70 47h32v33z" />
+    <glyph glyph-name=".notdef" 
+d="M410 800v-1000h-317v1000h317zM333 733h-165v-33h65v-37h-66v-33h166v33h-66v37h66v33zM267 604h-100v-104h166v34h-66v70zM233 570v-36h-33v36h33zM333 473h-166v-33h66v-37h-66v-33h100v70h66v33zM333 413h-33v-66h-133v-34h166v100zM333 291h-100v-56h34v23h33v-47
+h-100v80h-33v-113h166v113zM333 118h-166v-113h166v113zM300 85v-47h-100v47h100zM333 -18h-166v-33h70l-70 -47v-33h166v33h-102l70 47h32v33z" />
+    <glyph glyph-name=".null" horiz-adv-x="0" 
+ />
+    <glyph glyph-name="nonmarkingreturn" horiz-adv-x="333" 
+ />
+    <glyph glyph-name="space" unicode=" " horiz-adv-x="200" 
+ />
+    <glyph glyph-name="uni0490" unicode="&#x490;" horiz-adv-x="375" 
+d="M347 800q20 0 20 -20v-190q0 -8 -6 -14t-14 -6h-104q-27 0 -42 -17t-15 -47v-486q0 -20 -20 -20h-108q-20 0 -20 20v486q0 89 56.5 144t148.5 55h8v75q0 20 20 20h76z" />
+    <glyph glyph-name="uni0491" unicode="&#x491;" horiz-adv-x="311" 
+d="M53 0q-20 0 -20 20v302q0 84 41.5 131.5t115.5 47.5v59q0 20 20 20h67q20 0 20 -20v-125q0 -60 -60 -60h-26q-40 0 -40 -44v-311q0 -20 -20 -20h-98z" />
+    <hkern g1="uni0491"
+	g2="uni0491"
+	k="14" />
+    <hkern g1="uni0490"
+	g2="uni0490"
+	k="31" />
+    <hkern g1="uni0490"
+	g2="uni0491"
+	k="120" />
+  </font>
+</defs></svg>
