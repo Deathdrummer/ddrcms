@@ -3,6 +3,7 @@
 class Admin extends MY_Controller {
 	
 	public $viewsPath = 'views/admin/';
+	private $macroFuncs = ['renderSections', 'testMacro']; # макросы twig
 	
 	public function __construct() {
 		parent::__construct();
@@ -1673,7 +1674,7 @@ class Admin extends MY_Controller {
 		$pageData = file_get_contents('./public/views/site/index.tpl');
 		
 		
-		$pageData = str_replace("{% from macro import renderSections %}\n", '', $pageData);
+		$pageData = preg_replace("/\{\% from macro import .+ \%\}\R/", '', $pageData);
 		$pageData = str_replace("{% include cms %}", "", $pageData);
 		
 		
@@ -1689,8 +1690,7 @@ class Admin extends MY_Controller {
 		if (!$this->input->is_ajax_request()) return false;
 		$pageData = $this->input->post('data');
 		
-		
-		$pageData = "{% from macro import renderSections %}\n".$pageData;
+		$pageData = "{% from macro import ".implode(', ', $this->macroFuncs)." %}\n".$pageData;
 		$pageData = str_replace('</head>', "{% include cms %}</head>", $pageData);
 		
 		file_put_contents('./public/views/site/index.tpl', $pageData);

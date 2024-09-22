@@ -1,4 +1,4 @@
-{% from macro import renderSections, renderSections2 %}
+{% from macro import renderSections, testMacro %}
 <!DOCTYPE html>
 <html lang="en">
 <head>

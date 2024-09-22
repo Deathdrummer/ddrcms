@@ -1,0 +1,11 @@
+{% macro renderSections(sections) %}
+	{% for section in sections %}
+		{% include 'views/site/sections/'~(section.filename|ext('tpl')) with section.data %}
+	{% endfor %}
+{% endmacro %}
+
+{% macro testMacro(sections) %}
+	{% for section in sections %}
+		{% include 'views/site/sections/'~(section.filename|ext('tpl')) with section.data %}
+	{% endfor %}
+{% endmacro %}

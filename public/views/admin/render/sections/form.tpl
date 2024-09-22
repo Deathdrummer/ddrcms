@@ -15,7 +15,14 @@
 				<td colspan="2" class="text-left">
 					<div class="justify-content-start"><span>Код секции:</span></div>
 					<textarea name="code" id="hideCodeData" hidden>{{section_code}}</textarea>
-					<div class="h-80rem w-100" id="codeSection"></div>
+					<div class="h-80rem w-100 codelyout" id="codeSection">
+						<div class="codelyout__info codelyout__info-visible" id="codeSectionWait">
+							<div>
+								<i class="fa fa-spinner fa-pulse fa-fw"></i>
+								<p>Загрузка редактора...</p>
+							</div>
+						</div>
+					</div>
 				</td>
 			</tr>
 			<tr>

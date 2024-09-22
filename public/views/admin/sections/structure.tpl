@@ -2,7 +2,7 @@
 	<div class="section_title">
 		<h2>Структура сайта</h2>
 		<div class="buttons notop">
-			<button class="large alt" id="codeSave" title="Сохранить макет" style="display:none;"><i class="fa fa-save"></i> <span>Сохранить макет</span></button>
+			<button class="large alt" id="codeSave" disabled title="Сохранить макет" style="display:none;"><i class="fa fa-save"></i> <span>Сохранить макет</span></button>
 		</div>
 	</div>
 	
@@ -21,7 +21,14 @@
 	
 	<div class="tabscontent">
 		<div tabid="tabLayout">
-			<div id="codeLayout" class="mt-20px" style="height:calc(100vh - 250px); min-height:400px;"></div>
+			<div id="codeLayout" class="mt-20px codelyout" style="height:calc(100vh - 250px); min-height:400px;">
+				<div class="codelyout__info codelyout__info-visible" id="codeLayoutWait">
+					<div>
+						<i class="fa fa-spinner fa-pulse fa-fw"></i>
+						<p>Загрузка редактора...</p>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 		<div tabid="tabPages">
@@ -373,8 +380,9 @@ $(document).ready(function() {
 	async function buildCodeEditor() {
 		
 		const {setCode, getCode, destroy, addActions} = await $('#codeLayout').code({
-			onChange(data) {
-				$('#codeSave').removeAttrib('disabled');
+			onChange(data, {isFlush}) {
+				if (!isFlush) $('#codeSave').removeAttrib('disabled');
+				else $('#codeLayoutWait').removeClass('codelyout__info-visible');
 			},
 			//value: 'rgter ererherher haerhea ',
 			language: 'twig',
@@ -925,15 +933,23 @@ $(document).ready(function() {
 				const {addActions} = await $('#codeSection').code({
 					value: hideCodeData,
 					changeTimeout: 100,
-					onChange(data) {
+					onChange(data, {isFlush}) {
 						$('#hideCodeData').val(data);
 					},
 					//value: 'rgter ererherher haerhea ',
 					language: 'twig',
 				});
 				
+				$('#codeSectionWait').removeClass('codelyout__info-visible');
+				
 				const codeNavData = await loadCodeNav();
 				addActions(codeNavData);
+				
+				
+				updateSectionWin.onClose(() => {
+					$('#codeSectionWait').addClass('codelyout__info-visible');
+				});
+				
 				
 				
 				$('#newsectionfield').on('change', function() {

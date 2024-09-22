@@ -20,7 +20,7 @@ class MY_Controller extends CI_Controller {
         $this->controllerName = strtolower(reset($this->uri->rsegments));
         
         $this->twig->addGlobal('cms', 'views/site/layout/cms.tpl');
-        $this->twig->addGlobal('macro', 'views/site/macro.html.twig');
+        $this->twig->addGlobal('macro', 'views/admin/macro.html.twig');
         $this->twig->addGlobal('assets', 'public/filemanager/assets/');
         $this->twig->addGlobal('files', 'public/filemanager/');
         $this->twig->addGlobal('filemanager', 'public/filemanager/');
