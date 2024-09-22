@@ -1,2 +1,2 @@
 @echo off
-mklink /D ".\assets" ".\public\filemanager\assets"
+mklink /D assets public\filemanager\assets
