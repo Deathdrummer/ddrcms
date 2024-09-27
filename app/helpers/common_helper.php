@@ -159,7 +159,7 @@ if (!function_exists('toCamelCase')) {
 if (!function_exists('generateCode')) {
 	/**
 	 * Генерация кода
-	 * @param маска: * - буква с нижним регистром, # - буква с верхним регистром, ? - цифра
+	 * @param маска: l - буква с нижним регистром, L - буква с верхним регистром, n - цифра
 	 * @return Сгенерированный код
 	*/
 	function generateCode($mask = null) {
@@ -167,9 +167,9 @@ if (!function_exists('generateCode')) {
 		$code = '';
 		
 		for($x = 0; $x < strlen($mask); $x++) {
-			if (substr($mask, $x, 1) == '*') $code .= $letters[rand(0,25)];
-			else if (substr($mask, $x, 1) == '#') $code .= strtoupper($letters[rand(0,25)]);
-			else if (substr($mask, $x, 1) == '?') $code .= rand(0,9);
+			if (substr($mask, $x, 1) == 'l') $code .= $letters[rand(0,25)];
+			else if (substr($mask, $x, 1) == 'L') $code .= strtoupper($letters[rand(0,25)]);
+			else if (substr($mask, $x, 1) == 'n') $code .= rand(0,9);
 			else $code .= substr($mask, $x, 1);
 		}
 		return $code;
@@ -211,7 +211,7 @@ if (!function_exists('filemanager')) {
 	function filemanager($path = null, $fallback = null) {
 		if (!is_null($path) && is_file('public/filemanager/'.$path)) return base_url('public/filemanager/'.$path);
 		
-		if ($fallback) return base_url('public/'.$fallback);
+		if (!is_null($fallback)) return base_url('public/'.$fallback);
 			
 		return null;
 	}
@@ -252,6 +252,48 @@ if (!function_exists('assets')) {
 		return null;
 	}
 }
+
+
+
+if (!function_exists('mod')) {
+	/**
+	 * 
+	 * @param 
+	 * @return 
+	*/
+	function mod($data = null) {
+		$CI =& get_instance();
+		$activeMod = $CI->mods->getActiveMod('site');
+		return $data[$activeMod] ?? null;
+	}
+}
+
+
+
+
+if (!function_exists('modsList')) {
+	/**
+	 * 
+	 * @param 
+	 * @return 
+	*/
+	function modsList() {
+		$CI =& get_instance();
+		$activeMod = $CI->mods->getActiveMod('site');
+		$allMods = $CI->mods->getAllMods('site');
+		
+		
+		return array_map(function($mod) use($activeMod) {
+			if ($mod['db'] == $activeMod) $mod['active'] = 1;
+			else $mod['active'] = 0;
+			
+			return $mod;
+		}, $allMods);
+	}
+}
+
+
+
 
 
 

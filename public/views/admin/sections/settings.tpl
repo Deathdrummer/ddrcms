@@ -23,6 +23,7 @@
 			<table class="fieldset">
 				{% include form~'file.tpl' with {'label': 'Изображения и иконки', 'data': [
 					{'name': 'setting_favicon', 'label': 'Фавикон', 'ext': 'images', 'id': 'faviconFile'},
+					{'name': 'setting_favicon_not_found', 'label': 'Фавикон (страница не найдена)', 'ext': 'images', 'id': 'faviconNotFoundFile'},
 				]} %}
 			</table>
 		</div>

@@ -32,6 +32,8 @@ class CI_Twig {
 		'filemanager',
 		'images',
 		'assets',
+		'mod',
+		'modsList',
 		'getHoursMinutes',
 		'time',
 		'date',

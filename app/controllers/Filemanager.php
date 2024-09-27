@@ -155,10 +155,13 @@ class Filemanager extends MY_Controller {
 			     is_dir($obj) ? removeDirectory($obj) : unlink($obj);
 			   }
 			}
-			return rmdir($dir);
+			if (is_dir($dir)) return rmdir($dir);
 		}
 		
-		if (removeDirectory($path) && removeDirectory($thumbsPath) && removeDirectory($miniPath)) exit('1');
+		removeDirectory($thumbsPath);
+		removeDirectory($miniPath);
+		
+		if (removeDirectory($path)) exit('1');
 		echo 0;
 	}
 	

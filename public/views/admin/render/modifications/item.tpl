@@ -1,4 +1,5 @@
 <tr>
+	<td class="center"><img src="{{filemanager(icon, 'images/no_product_300.png')}}" alt="" class="icon"></td>
 	<td>{{title}}</td>
 	<td>{{db}}</td>
 	<td>{{label}}</td>

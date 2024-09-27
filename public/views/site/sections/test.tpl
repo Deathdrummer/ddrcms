@@ -17,7 +17,16 @@
 					<div class="col-lg-6 col-xl-5">
 						<div class="text-container">
 							<h1>{{title}}</h1>
-							<p class="p-large">Use Tivo to automate your marketing actions in order to reach a much larger audience</p>
+							
+							<ul>
+								{% for mod in modsList()%}
+									<li{% if mod.active%} class="active"{% endif %} onclick="changeMod('{{mod.db}}', {{mod.active}})">
+										{{mod.label}}
+										<img src="{{mod.icon}}" />
+									</li>
+								{% endfor %}
+							</ul>
+							
 							<a class="btn-solid-lg page-scroll" href="sign-up.html">SIGN UP</a>
 						</div> <!-- end of text-container -->
 					</div> <!-- end of col -->

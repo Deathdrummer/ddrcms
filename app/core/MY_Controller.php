@@ -15,11 +15,12 @@ class MY_Controller extends CI_Controller {
     public function __construct() {
         set_time_limit(180);
         parent::__construct();
-        
+		
         $this->minutes = range(0, 55, 5);
         $this->controllerName = strtolower(reset($this->uri->rsegments));
         
         $this->twig->addGlobal('cms', 'views/site/layout/cms.tpl');
+        $this->twig->addGlobal('site_scripts', 'views/site/layout/scripts.tpl');
         $this->twig->addGlobal('macro', 'views/admin/macro.html.twig');
         $this->twig->addGlobal('assets', 'public/filemanager/assets/');
         $this->twig->addGlobal('files', 'public/filemanager/');
@@ -27,19 +28,9 @@ class MY_Controller extends CI_Controller {
         $this->twig->addGlobal('images', 'public/images/');
         
         
-        //$this->load->model('modifications_model', 'modsmodel');
-        //$this->modsmodel->setBaseModification();
-        
         
 
         //--------------------------------------------------------------------------- Twig фильтры
-
-        /*$this->twig->addFilter('bbcode', function($str = '') {
-        if (!$str) return '';
-        $search = [];
-        $replace = [];
-        return
-        });*/
 
         $this->twig->addFilter('d', function ($date, $isShort = false) {
             if ($isShort) {
@@ -52,38 +43,23 @@ class MY_Controller extends CI_Controller {
         $this->twig->addFilter('t', function ($time) {
             return date('H:i', $time);
         });
-
-        $this->twig->addFilter('reset', function ($array) {
-            if (!is_array($array)) {
-                return null;
-            }
-
-            return reset($array);
-        });
-
-        $this->twig->addFilter('week', function ($date) {
+		
+		$this->twig->addFilter('week', function ($date) {
             $weekDay = date('N', $date);
             return $this->week[$weekDay];
         });
-
-        $this->twig->addFilter('postfix', function ($fileName, $postfix) {
-            if (!$fileName || !$postfix) {
-                return '';
+		
+        $this->twig->addFilter('arr_first_item', function ($array) {
+            if (!is_array($array)) {
+                return null;
             }
-
-            $fileData = explode('.', $fileName);
-            return implode('.', [$fileData[0] . $postfix, $fileData[1]]);
+            return reset($array);
         });
 
-        /*$this->twig->addFilter('postfix_setting', function($postfix, $default = '_setting') {
-        return isset($postfix) ? ($postfix == 0 ? '' : $postfix) : $default;
-        });*/
+        
 
         $this->twig->addFilter('merge', function ($arr, $key, $value = null) {
-            if (is_null($value)) {
-                return array_merge($arr, $key);
-            }
-
+            if (is_null($value)) return array_merge($arr, $key);
             return array_merge($arr, [$key => $value]);
         });
 
@@ -98,7 +74,12 @@ class MY_Controller extends CI_Controller {
         $this->twig->addFilter('chunk', function ($arr, $size, $preserveKeys = false) {
             return array_chunk($arr, $size, $preserveKeys);
         });
-
+		
+		$this->twig->addFilter('arrtocols', function ($arr, $cols, $preserveKeys = false) {
+            $size = ceil(count($arr) / $cols);
+            return array_chunk($arr, $size, $preserveKeys);
+        });
+		
         $this->twig->addFilter('randfromlist', function ($list, $count = false) {
             if (!$list || !is_array($list) || !$count) {
                 return false;
@@ -115,10 +96,7 @@ class MY_Controller extends CI_Controller {
             return $result;
         });
 
-        $this->twig->addFilter('arrtocols', function ($arr, $cols, $preserveKeys = false) {
-            $size = ceil(count($arr) / $cols);
-            return array_chunk($arr, $size, $preserveKeys);
-        });
+        
 
         $this->twig->addFilter('arrstrtswith', function ($arr, $symbal, $arrItem = false) {
             if (!is_array($arr)) {
@@ -384,6 +362,37 @@ class MY_Controller extends CI_Controller {
             _recur($data, $item, $childField, $wtgs, $levelLimit);
             echo $wtgs[1];
         });
+		
+		//------------------------------------------------ к фильтру recursive
+        function _recur($iter, $i, $chFd, $wtgs, $lim) {
+            static $level = 0;
+            static $list = '';
+
+            if ($iter) {
+                foreach ($iter as $k => $row) {
+                    ++$level;
+                    $list = preg_replace_callback('/\{(\w+)\}/ui', function ($m) use ($row) {
+                        if (!isset($m[1]) || !isset($row[$m[1]])) {
+                            return false;
+                        }
+
+                        return $row[$m[1]];
+                    }, $i);
+
+                    echo $list;
+                    if (isset($row[$chFd]) && (!$lim || $level < $lim)) {
+                        echo str_replace('>', ' level="' . ($level + 1) . '">', $wtgs[0]);
+                        _recur($row[$chFd], $i, $chFd, $wtgs, $lim, $level);
+                        echo $wtgs[1];
+                    }
+                    $level = 0;
+                }
+
+            }
+            return $list;
+        }
+		
+		
 
         $this->twig->addFilter('randomaddinarray', function ($arr = false, $item = false) {
             if (!$arr) {
@@ -430,37 +439,6 @@ class MY_Controller extends CI_Controller {
             }
             return $result;
         });
-
-        //------------------------------------------------ к фильтру recursive
-        function _recur($iter, $i, $chFd, $wtgs, $lim)
-        {
-            static $level = 0;
-            static $list = '';
-
-            if ($iter) {
-                foreach ($iter as $k => $row) {
-                    ++$level;
-                    $list = preg_replace_callback('/\{(\w+)\}/ui', function ($m) use ($row) {
-                        if (!isset($m[1]) || !isset($row[$m[1]])) {
-                            return false;
-                        }
-
-                        return $row[$m[1]];
-                    }, $i);
-
-                    echo $list;
-                    if (isset($row[$chFd]) && (!$lim || $level < $lim)) {
-                        echo str_replace('>', ' level="' . ($level + 1) . '">', $wtgs[0]);
-                        _recur($row[$chFd], $i, $chFd, $wtgs, $lim, $level);
-                        echo $wtgs[1];
-                    }
-                    $level = 0;
-                }
-
-            }
-            return $list;
-        }
-
     }
 
 
@@ -560,13 +538,14 @@ class MY_Controller extends CI_Controller {
             toLog('_uploadFile -> нет настроек!');
             return false;
         }
+		
         extract($settings);
 
         if (!$file || !$path) {
             return false;
         }
 
-        $fullPath = substr($path, -1) == '/' ? 'public/images/' . $path : 'public/images/' . $path . '/';
+        $fullPath = substr($path, -1) == '/' ? $path : $path.'/';
         if (!is_dir($fullPath)) {
             mkdir($fullPath);
         }

@@ -1,9 +1,6 @@
 <div class="section" id="{{id}}">
 	<div class="section_title">
 		<h2>Структура сайта</h2>
-		<div class="buttons notop">
-			<button class="large alt" id="codeSave" disabled title="Сохранить макет" style="display:none;"><i class="fa fa-save"></i> <span>Сохранить макет</span></button>
-		</div>
 	</div>
 	
 	
@@ -21,7 +18,41 @@
 	
 	<div class="tabscontent">
 		<div tabid="tabLayout">
-			<div id="codeLayout" class="mt-20px codelyout" style="height:calc(100vh - 250px); min-height:400px;">
+		
+			<div class="row">
+				<div class="col-auto">
+					<div class="row gutters-4 align-items-center">
+						<div class="col-auto">
+							<p>Макет:</p>
+						</div>
+						<div class="col">
+							<div class="select">
+								<select id="codeLayoutType" disaled>
+									<optgroup label="Макеты">
+										<option value="index">Основной</option>
+										<option value="not_found">Страница не найдена</option>
+									</optgroup>
+									<optgroup label="E-mail">
+										<option value="email/send">Письмо владельцу</option>
+									</optgroup>
+								</select>
+							</div>
+						</div>
+					</div>	
+				</div>
+				<div class="col-auto ml-auto">
+					<div class="buttons notop">
+						<button class="large alt" id="codeSave" disabled title="Сохранить макет" style="display:none;"><i class="fa fa-save"></i> <span>Сохранить</span></button>
+					</div>
+				</div>
+			</div>
+			
+		
+					
+			
+				
+			
+			<div id="codeLayout" class="mt-10px codelyout" style="height:calc(100vh - 250px); min-height:400px;">
 				<div class="codelyout__info codelyout__info-visible" id="codeLayoutWait">
 					<div>
 						<i class="fa fa-spinner fa-pulse fa-fw"></i>
@@ -356,19 +387,24 @@
 <script type="text/javascript"><!--
 $(document).ready(function() {
 	
+	let codeEditorObj;
 	if ($('#codeLayout').is(':visible')) {
-		buildCodeEditor();
+		buildCodeEditor().then((cEObj) => {
+			codeEditorObj = cEObj;
+		});
 		$('#codeSave').show();
 	} else {
 		$(document).on('tabsChange.code', function (e, tabId) {
 			if (tabId  != 'tabLayout') return;
-			buildCodeEditor();
+			buildCodeEditor().then((cEObj) => {
+				codeEditorObj = cEObj;
+			});
 			$(document).off('tabsChange.code');
 		});
 	}
 	
 	
-	$(document).on('tabsChange.rool', function (e, tabId) {
+	$(document).on('tabsChange', function (e, tabId) {
 		if (tabId == 'tabLayout') {
 			$('#codeSave').show();
 		} else {
@@ -377,41 +413,99 @@ $(document).ready(function() {
 	});
 	
 	
-	async function buildCodeEditor() {
-		
-		const {setCode, getCode, destroy, addActions} = await $('#codeLayout').code({
-			onChange(data, {isFlush}) {
-				if (!isFlush) $('#codeSave').removeAttrib('disabled');
-				else $('#codeLayoutWait').removeClass('codelyout__info-visible');
-			},
-			//value: 'rgter ererherher haerhea ',
-			language: 'twig',
-			//actions: codeNavData
+	
+	$('#codeLayoutType').on('change', async (e) => {
+		$('#codeLayoutWait').addClass('codelyout__info-visible');
+		await codeEditorObj.loadLayout(e.target.value);
+		codeEditorObj.loadActions(e.target.value);
+		$('#codeSave').setAttrib('disabled');
+		$('#codeLayoutWait').removeClass('codelyout__info-visible');
+	});
+	
+	
+	$('#codeSave').on(tapEvent, (e) => {
+		const btn = e.currentTarget,
+			data = codeEditorObj.getCode(),
+			layout = $('#codeLayoutType').val();
+		$.post('/admin/set_page_template', {layout, data}, function (res) {
+			if (!res) {
+				notify('Ошибка сохранения кода!', 'error');
+				return;
+			}
+			
+			notify('Код успешно сохранен!');
+			
+			$(btn).setAttrib('disabled');
 		});
+	});	
+	
+	
+	
+	
+	async function buildCodeEditor(layout = null) {
+		layout = layout || $('#codeLayoutType').val();
 		
-		
-		const codeNavData = await loadCodeNav();
-		addActions(codeNavData);
-		
-		
-		$.post('/admin/get_page_template', function (data) {
-			setCode(data);
-		}, 'html');
-		
-		$('#codeSave').on(tapEvent, (e) => {
-			const btn = e.currentTarget,
-				data = getCode();
-			$.post('/admin/set_page_template', {data}, function (res) {
-				if (!res) {
-					notify('Ошибка сохранения кода!', 'error');
-					return;
+		return new Promise(async function(resolve, reject) {
+			try {
+				const {setCode, getCode, destroy, addActions} = await $('#codeLayout').code({
+					onChange(data, {isFlush}) {
+						if (!isFlush) $('#codeSave').removeAttrib('disabled');
+						else $('#codeLayoutWait').removeClass('codelyout__info-visible');
+					},
+					//value: 'rgter ererherher haerhea ',
+					language: 'twig',
+					//actions: codeNavData
+				});
+				
+				
+				function loadActions(layout) {
+					return new Promise(async function(resolve, reject) {
+						try {
+							const navFile = {
+								index: 'codeNav',
+								not_found: 'notFound',
+								'email/send': 'email'
+							};
+							
+							const codeNavData = await loadCodeNav(navFile[layout]);
+							addActions(codeNavData, true);
+							resolve();
+						} catch(e) {
+							reject(e);
+							showError(e);
+						}
+					});		
 				}
 				
-				notify('Код успешно сохранен!');
+				function loadLayout(layout) {
+					return new Promise(function(resolve, reject) {
+						try {
+							$('#codeLayoutType').setAttrib('disabled');
+							$.post('/admin/get_page_template', {layout}, function (data) {
+								setCode(data);
+								$('#codeLayoutType').removeAttrib('disabled');
+								resolve();
+							}, 'html');
+						} catch(e) {
+							reject(e);
+							showError(e);
+						}
+					});		
+				}
 				
-				$(btn).setAttrib('disabled');
-			});
-		});	
+				
+				loadActions(layout)
+				loadLayout(layout);
+				
+				
+				$('#codeLayoutType').removeAttrib('disabled');
+				
+				resolve({loadLayout, loadActions, setCode, getCode});
+			} catch(e) {
+				reject(e);
+				showError(e);
+			}
+		});
 	}
 	
 	
@@ -827,18 +921,6 @@ $(document).ready(function() {
 			newSectionWin.setData('admin/sections/get_form', async function() {
 				var index = $('#sectionFields').children('tr:not(.empty)').length;
 				
-				const {addActions} = await $('#codeSection').code({
-					changeTimeout: 100,
-					onChange(data) {
-						$('#hideCodeData').val(data);
-					},
-					language: 'twig',
-				});
-				
-				const codeNavData = await loadCodeNav();
-				addActions(codeNavData);
-				
-				
 				$('#newsectionfield').on('change', function() {
 					var thisSelect = this,
 						type = $(thisSelect).val();
@@ -895,9 +977,28 @@ $(document).ready(function() {
 				
 				$(newSectionWin.getSelector).on(tapEvent, '[copysectionvariable]', function() {
 					const variabledata = $(this).closest('.row').find('[variablefield]').val();
-					console.log('\{\{'+variabledata+'\}\}');
+					if (!variabledata) {
+						const field = $(this).closest('td').find('.field');
+						$(field).addClass('error');
+						return;
+					}
 					copyStringToClipboard('\{\{'+variabledata+'\}\}')
+					notify('Переменная скопирована!');
 				});
+				
+				
+				const {addActions} = await $('#codeSection').code({
+					changeTimeout: 100,
+					onChange(data) {
+						$('#hideCodeData').val(data);
+					},
+					language: 'twig',
+				});
+				
+				$('#codeSectionWait').removeClass('codelyout__info-visible');
+				
+				const codeNavData = await loadCodeNav('codeNav');
+				addActions(codeNavData);
 				
 				fieldRulesTooltip = new jBox('Tooltip', toolTipOps);
 				
@@ -927,30 +1028,6 @@ $(document).ready(function() {
 			updateSectionWin.setData('admin/sections/get_form', {id: sectionId, section_title: sectionTitle}, async function() {
 				var index = $('#sectionFields').children('tr:not(.empty)').length,
 					listsToRemove = [];
-				
-				const hideCodeData = $('#hideCodeData').val();
-				
-				const {addActions} = await $('#codeSection').code({
-					value: hideCodeData,
-					changeTimeout: 100,
-					onChange(data, {isFlush}) {
-						$('#hideCodeData').val(data);
-					},
-					//value: 'rgter ererherher haerhea ',
-					language: 'twig',
-				});
-				
-				$('#codeSectionWait').removeClass('codelyout__info-visible');
-				
-				const codeNavData = await loadCodeNav();
-				addActions(codeNavData);
-				
-				
-				updateSectionWin.onClose(() => {
-					$('#codeSectionWait').addClass('codelyout__info-visible');
-				});
-				
-				
 				
 				$('#newsectionfield').on('change', function() {
 					var thisSelect = this,
@@ -1029,9 +1106,34 @@ $(document).ready(function() {
 				
 				$(updateSectionWin.getSelector).on(tapEvent, '[copysectionvariable]', function() {
 					const variabledata = $(this).closest('.row').find('[variablefield]').val();
-					console.log('\{\{'+variabledata+'\}\}');
-					copyStringToClipboard('\{\{'+variabledata+'\}\}')
+					if (!variabledata) {
+						const field = $(this).closest('td').find('.field');
+						$(field).addClass('error');
+						return;
+					}
+					copyStringToClipboard('\{\{'+variabledata+'\}\}');
+					notify('Переменная скопирована!');
 				});
+				
+				
+				const hideCodeData = $('#hideCodeData').val();
+				
+				const {addActions} = await $('#codeSection').code({
+					value: hideCodeData,
+					changeTimeout: 100,
+					onChange(data, {isFlush}) {
+						$('#hideCodeData').val(data);
+					},
+					//value: 'rgter ererherher haerhea ',
+					language: 'twig',
+				});
+				
+				$('#codeSectionWait').removeClass('codelyout__info-visible');
+				
+				const codeNavData = await loadCodeNav('codeNav');
+				addActions(codeNavData);
+				
+				
 				
 				fieldRulesTooltip = new jBox('Tooltip', toolTipOps);
 				

@@ -34,7 +34,7 @@
 			</div>
 		</td>
 	</tr>
-	<tr>
+	{# <tr>
 		<td class="w-24"><div><span>База данных</span></div></td>
 		<td>
 			<div class="row gutters-3">
@@ -46,9 +46,9 @@
 				</div>
 			</div>
 		</td>
-	</tr>
+	</tr> #}
 	<tr>
-		<td class="w-24"><div><span>Копировать данные из модификации</span></div></td>
+		<td class="w-24"><div><span>Копировать данные из мода</span></div></td>
 		<td>
 			{% if modifications %}
 				<div class="select">

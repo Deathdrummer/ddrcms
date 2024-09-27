@@ -1,12 +1,13 @@
 <div class="section" id="{{id}}">
 	<div class="section_title">
-		<h2>Модификации</h2>
+		<h2>Моды</h2>
 	</div>
 	
 	
 	<table>
 		<thead>
 			<tr>
+				<td class="w-50px">Иконка</td>
 				<td>Название</td>
 				<td class="w-20">Имя базы данных</td>
 				<td class="w-20">Лейбл</td>
@@ -18,6 +19,7 @@
 			{% if modifications %}
 				{% for id, mod in modifications %}
 					<tr>
+						<td class="center"><img src="{{filemanager(mod.icon, 'images/none_img.png')}}" alt="" class="icon"></td>
 						<td>{{mod.title}}</td>
 						<td>{{mod.db}}</td>
 						<td>{{mod.label}}</td>
@@ -45,15 +47,15 @@
 				{% endfor %}
 			{% else %}
 				<tr class="empty">
-					<td colspan="5"><p class="empty center">Нет данных</p></td>
+					<td colspan="6"><p class="empty center">Нет данных</p></td>
 				</tr>
 			{% endif %}
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="5">
+				<td colspan="6">
 					<div class="buttons nowrap right notop">
-						<button id="modificationsNew" title="Новый модификатор">Новая модификация</button>
+						<button id="modificationsNew" title="Новый модификатор">Новый мод</button>
 					</div>
 				</td>
 			</tr>
@@ -73,7 +75,7 @@ $(document).ready(function() {
 		var isMain = $(this).attr('main') != undefined ? 1 : 0;;
 		
 		ddrPopUp({
-			title: 'Новая модификация|4',
+			title: 'Новый мод|4',
 			width: 800,
 			buttons: [{id: 'modificationsAdd', title: 'Добавить'}],
 			closeByButton: true,
@@ -85,6 +87,7 @@ $(document).ready(function() {
 				$('#modForm').formSubmit({
 					url: 'admin/modifications/save',
 					dataType: 'html',
+					fields: {db: 'ddrcms_'+generateCode('llllnnn')},
 					before: function() {
 						newModificationWin.wait();
 					},
@@ -92,14 +95,14 @@ $(document).ready(function() {
 						if (row != 0) {
 							if ($('#modificationsList').children('tr.empty').length == 1) $('#modificationsList').children('tr.empty').remove();
 							$('#modificationsList').append(row);
-							notify('Модификация успешно добавлена!');
+							notify('Мод успешно добавлен!');
 							
 							const newOption = $('<option></option>').val(postData.db).text(postData.title);
 							$('#adminSetModifications').append(newOption);
 							
 							newModificationWin.close();
 						} else {
-							notify('ошибка добавления модификации!', 'error');
+							notify('ошибка добавления мода!', 'error');
 						}
 					},
 					complete: function() {
@@ -119,7 +122,7 @@ $(document).ready(function() {
 			row = $(this).closest('tr');
 		
 		ddrPopUp({
-			title: 'Изменить модификацию|4',
+			title: 'Изменить мод|4',
 			width: 800,
 			buttons: [{id: 'modificationsUpdate', title: 'Обновить'}],
 			closeByButton: true,
@@ -131,19 +134,20 @@ $(document).ready(function() {
 				$('#modForm').formSubmit({
 					url: 'admin/modifications/update',
 					dataType: 'html',
+					fields: {db: dbName},
 					before: function() {
 						updateModificationWin.wait();
 					},
 					success: function(rowData, postData) {
 						if (rowData) {
 							$(row).replaceWith(rowData);
-							notify('Модификация успешно обновлена!');
+							notify('Мод успешно обновлен!');
 							
 							$('#adminSetModifications').children('option[value="'+dbName+'"]').text(postData.title);
 							
 							updateModificationWin.close();
 						} else {
-							notify('ошибка обновления модификации!', 'error');
+							notify('ошибка обновления мода!', 'error');
 						}
 					},
 					complete: function() {
@@ -166,9 +170,9 @@ $(document).ready(function() {
 			row = $(this).closest('tr');
 		
 		ddrPopUp({
-			title: 'Удалить модификацию|4',
+			title: 'Удалить мод|4',
 			width: 400,
-			html: '<p class="red">Вы действительно хотите удалить модификацию?</p>',
+			html: '<p class="red">Вы действительно хотите удалить мод?</p>',
 			buttons: [{id: 'modificationsRemove', title: 'Удалить'}],
 			close: 'Отмена',
 			contentToCenter: true
@@ -177,7 +181,7 @@ $(document).ready(function() {
 				removeModificationWin.wait();
 				$.post('/admin/modifications/remove', {mod: modName}, function(result) {
 					if (result) {
-						notify('Модификация успешно удалена!');
+						notify('Мод успешно удален!');
 						$('#adminSetModifications').children('option[value="'+modName+'"]').remove();
 						removeModificationWin.close();
 						if ($('#modificationsList').children('tr').length == 1) {
@@ -186,7 +190,7 @@ $(document).ready(function() {
 							$(row).remove();
 						}
 					} else {
-						notify('Ошибка удаления модификации!', 'error');
+						notify('Ошибка удаления мода!', 'error');
 						removeModificationWin.wait(false);
 					}
 				});
@@ -201,11 +205,11 @@ $(document).ready(function() {
 		
 		$.post('/admin/modifications/set_modification', {controller: 'site', mod: modName}, function(result) {
 			if (result) {
-				notify('Модификация успешно изменена!');
+				notify('Мод успешно изменен!');
 				$('#adminSetModifications').children('option:selected').prop('selected', false);
 				$('#adminSetModifications').children('option[value="'+modName+'"]').prop('selected', true);
 			}
-			else notify('Ошибка изменения модификации!', 'error');
+			else notify('Ошибка изменения мода!', 'error');
 		}, 'json').error((err) => {
 			console.log(err);
 		});

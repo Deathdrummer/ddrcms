@@ -1,43 +1,5 @@
 <?
 
-if (!function_exists('ddrFiles')) {
-	/**
-	 * Сформировать массив $_FILES (по-моему не работает попробуй reArrayFiles)
-	 * @param $_FILES
-	 * @param Вернуть определенный индекс
-	 * @return измененный массив $_FILES
-	*/
-    function ddrFiles($files = false, $index = null) {
-        $arrayForFill = [];
-        
-        function rRestructuringFilesArray(&$arrayForFill, $currentKey, $currentMixedValue, $fileDescriptionParam) {
-            if (is_array($currentMixedValue)) {
-                foreach ($currentMixedValue as $nameKey => $mixedValue) {
-                    rRestructuringFilesArray($arrayForFill[$currentKey], $nameKey, $mixedValue, $fileDescriptionParam);
-                }
-            } else {
-                $arrayForFill[$currentKey][$fileDescriptionParam] = $currentMixedValue;
-            }
-        }
-        
-        foreach ($files as $firstNameKey => $arFileDescriptions) {
-            foreach ($arFileDescriptions as $fileDescriptionParam => $mixedValue) {
-                rRestructuringFilesArray($arrayForFill, $firstNameKey, $files[$firstNameKey][$fileDescriptionParam], $fileDescriptionParam);
-            }
-        }
-        
-        if (!is_null($index) && isset($arrayForFill[$index])) return $arrayForFill[$index];
-        return $arrayForFill ?: false;
-    }
-}
-
-
-
-
-
-
-
-
 
 
 if (!function_exists('reArrayFiles')) {

@@ -41,7 +41,7 @@
 		<td class="w-30"><div><span>Вариант изменения размера</span></div></td>
 		<td>
 			<div class="radio">
-				<div class="radio__item radio__item_var1">
+				<div class="radio__item radio__item_var1 mb-2rem">
 					<div>
 						<input id="resizeVariant1"
 						type="radio"
@@ -50,7 +50,7 @@
 						value="hard">
 						<label for="resizeVariant1"></label>
 					</div>
-					<label for="resizeVariant1">Жестко</label>
+					<label for="resizeVariant1">Размер задается жестко, по наибольшей стороне картинки</label>
 				</div>
 				<div class="radio__item radio__item_var1">
 					<div>
@@ -61,7 +61,7 @@
 						value="less">
 						<label for="resizeVariant2"></label>
 					</div>
-					<label for="resizeVariant2">На уменьшение</label>
+					<label for="resizeVariant2">Размер задается, только если фактический размер наибольшей стороны картинки больше заданного</label>
 				</div>
 			</div>
 		</td>

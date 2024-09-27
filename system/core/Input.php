@@ -287,30 +287,52 @@ class CI_Input {
 	public function ddrfiles($index = NULL, $xss_clean = NULL) {
 		$files = $this->_fetch_from_array($_FILES, $index, $xss_clean);
 		
-		function rRestructuringFilesArray(&$arrayForFill, $currentKey, $currentMixedValue, $fileDescriptionParam) {
+		if (!$files) return false;
+
+		$arrayForFill = [];
+
+		function rRestructuringFilesArray(&$arrayForFill, $fieldName, $currentKey, $currentMixedValue, $fileDescriptionParam) {
 			if (is_array($currentMixedValue)) {
-			    foreach ($currentMixedValue as $nameKey => $mixedValue) {
-					rRestructuringFilesArray($arrayForFill[$currentKey], $nameKey, $mixedValue, $fileDescriptionParam);
-			    }
-			} else {
-		    	$arrayForFill[$currentKey][$fileDescriptionParam] = $currentMixedValue;
+				foreach ($currentMixedValue as $nameKey => $mixedValue) {
+					rRestructuringFilesArray($arrayForFill, $fieldName, $nameKey, $mixedValue, $fileDescriptionParam);
+				}
+			} elseif (!empty($currentMixedValue) || $fileDescriptionParam === 'error') {
+				// Проверяем поле error
+				if ($fileDescriptionParam === 'error' && $currentMixedValue !== 0) {
+					unset($arrayForFill[$currentKey]);  // Удаляем всю запись, если есть ошибка
+				} else {
+					// Создаем новый ключ с названием поля и индексом
+					
+					$newKey = !is_null($currentKey) ? $fieldName . '_' . $currentKey : $fieldName;
+					$arrayForFill[$newKey][$fileDescriptionParam] = $currentMixedValue;
+				}
 			}
 		}
 
-		// массив, в котором будем формировать "правильный" $_FILES
-		$arrayForFill = [];
-
-		// первый уровень проходим без изменения
-		foreach ($files as $firstNameKey => $arFileDescriptions) {
-			// а вот со второго уровня интерпритатор делает то,
-			// что мне в большинстве случаев не подходит
-			foreach ($arFileDescriptions as $fileDescriptionParam => $mixedValue) {
-		    	rRestructuringFilesArray($arrayForFill, $firstNameKey, $files[$firstNameKey][$fileDescriptionParam], $fileDescriptionParam);
-		  	}
+		function removeEmptyFiles(&$arrayForFill) {
+			foreach ($arrayForFill as $key => &$value) {
+				if (is_array($value)) {
+					removeEmptyFiles($value);
+					if (empty($value)) {
+						unset($arrayForFill[$key]);
+					}
+				} elseif (empty($value)) {
+					unset($arrayForFill[$key]);
+				}
+			}
 		}
+
+		foreach ($files as $fieldName => $arFileDescriptions) {
+			foreach ($arFileDescriptions as $fileDescriptionParam => $mixedValue) {
+				rRestructuringFilesArray($arrayForFill, $fieldName, null, $mixedValue, $fileDescriptionParam);
+			}
+		}
+
+		removeEmptyFiles($arrayForFill);
+
+		if (!is_null($index) && isset($arrayForFill[$index])) return $arrayForFill[$index];
 		
-		// перегружаем $_FILES сформированным массивом
-		return $arrayForFill;
+		return !empty($arrayForFill) ? $arrayForFill : false;  
 	}
 
 	// --------------------------------------------------------------------

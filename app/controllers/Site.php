@@ -314,9 +314,9 @@ class Site extends MY_Controller {
 			$this->twig->display('views/'.$this->controllerName.'/index', $mainData);
 
 		} else {
-			$favicon = $this->settings->getSettings('favicon') ?: [];
+			$favicon = $this->settings->getSettings('favicon_not_found');
 			$this->output->set_status_header(404);
-			$this->twig->display('views/'.$this->controllerName.'/error', ['favicon' => $favicon]);
+			$this->twig->display('views/'.$this->controllerName.'/not_found', ['favicon' => $favicon]);
 		}
 	}
 
@@ -346,10 +346,11 @@ class Site extends MY_Controller {
 	 * @return
 	 */
 	public function error() {
+		return false;
 		if ($this->input->is_ajax_request()) return false;
 		$this->display([
-			'page' 			=> 'error',
-			'site_title'	=> 'Ошибка 404',
+			'page' 			=> 'not_found',
+			'page_title'	=> 'Ошибка 404',
 			'header' 		=> false,
 			'footer' 		=> false,
 			'mobile_nav'	=> false

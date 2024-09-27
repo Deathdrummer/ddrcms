@@ -35,7 +35,7 @@
 	<script src="{{base_url('public/js/functions.js')}}"></script>
 	<script src="{{base_url('public/js/common.js')}}"></script>
 	
-	<script src="{{base_url('public/js/code/loader.js')}}"></script>
+	<script src="{{base_url('public/js/plugins/code/loader.js')}}"></script>
 	
 	
 	<link rel="stylesheet" href="{{base_url('public/css/components.min.css')}}">
@@ -58,7 +58,7 @@
 						<li data-block="pages">Наполнение контента</li>
 						<li data-block="lists">Списки</li>
 						<li data-block="catalogs">Товары</li>
-						<li data-block="modifications">Модификации</li>
+						<li data-block="modifications">Моды</li>
 						{# <li data-block="promo">Промо</li> #}
 						{# <li data-block="reviews">Отзывы</li> #}
 						<li data-block="filemanager">Менеджер файлов</li>
@@ -70,7 +70,7 @@
 				<p>Административная панель</p>
 			</div>
 			<div class="header__item mr-4rem">
-				<small>Модификация:</small>
+				<small class="d-block nowrap">Мод (админ):</small>
 				<div class="select">
 					<select name="" id="adminSetModifications">
 						{% if modifications %}

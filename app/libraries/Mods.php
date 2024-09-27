@@ -25,18 +25,23 @@ class Mods {
 	*/
 	public function setBaseMod() {
 		if (!file_exists(MODIFICATIONS_FILE) || !$this->hasModsInFile()) {
-			$fp = fopen(MODIFICATIONS_FILE, "w");
+			$initBdName = config_item('db_name');
+			
 			$data[] = [
-				'title' 		=> 'Основная',
-				'db' 			=> config_item('db_name'),
-				'label'			=> null,
+				'title' 		=> 'Основной',
+				'db' 			=> $initBdName,
+				'label'			=> 'Основной',
 				'icon'			=> null,
 				'active_admin'	=> 1,
 				'active_site'	=> 1,
 				'main'			=> 1
 			];
 			
-			if (!$this->_writeModsFile($data)) return false;
+			if (!$this->_writeModsFile($data, true)) return false;
+			
+			$this->CI->load->library('ddrDb');
+			
+			if (!$this->CI->ddrdb->createTablesFromFile($initBdName)) return false;
 			
 			return true;
 		}
@@ -95,7 +100,7 @@ class Mods {
 	*/
 	public function getActiveMod($cName = false) {
 		if (!$cName) $cName = $this->_getContrllerName();
-		$fileData = $this->_readModsFile();
+		if (!$fileData = $this->_readModsFile()) return null;
 		$index = arrGetIndexFromField($fileData, 'active_'.$cName, 1);
 		return $fileData[$index]['db'];
 	}
@@ -191,9 +196,7 @@ class Mods {
 		
 		if (in_array($post['db'], array_column($fileData, 'db'))) return false;
 		
-		
-		$donorDb = $post['copy'] ?: false;
-		unset($post['copy']);
+		$donorDb = arrTakeItem($post, 'copy');
 		
 		$post['active_admin'] = 0;
 		$post['active_site'] = 0;
@@ -203,9 +206,14 @@ class Mods {
 		
 		if (!$this->_writeModsFile($fileData)) return false;
 		
+		$this->CI->load->library('ddrDb');
+		
+		$this->CI->ddrdb->createDatabase($post['db']);
 		
 		if ($donorDb) {
-			if (!$this->copyMod($donorDb, $post['db'])) return false;
+			if (!$this->CI->ddrdb->copyTables($donorDb, $post['db'])) return false;
+		} else {
+			if (!$this->CI->ddrdb->createTablesFromFile($post['db'])) return false;
 		}
 		
 		return true;
@@ -225,21 +233,21 @@ class Mods {
 	public function update($post = false) {
 		if (!$post) return false;
 		
-		$fileData = $this->_readModsFile(true);
+		if (!$fileData = $this->_readModsFile(true)) return false;
+		$db = arrTakeItem($post, 'db');
 		
-		$donorDb = $post['copy'] ?? false;
-		unset($post['copy']);
+		$donorDb = arrTakeItem($post, 'copy');
 		
-		
-		$fileData[$post['db']]['title'] = $post['title'];
-		$fileData[$post['db']]['icon'] = $post['icon'];
-		$fileData[$post['db']]['label'] = $post['label'];
-		if (!($post['main'] ?? false)) $fileData[$post['db']]['db'] = $post['db'];
+		$fileData[$db]['title'] = $post['title'];
+		$fileData[$db]['icon'] = $post['icon'];
+		$fileData[$db]['label'] = $post['label'];
+		if (!($post['main'] ?? false)) $fileData[$db]['db'] = $db;
 		
 		if (!$this->_writeModsFile($fileData)) return false;
 		
 		if ($donorDb) {
-			if (!$this->copyMod($donorDb, $post['db'])) return false;
+			$this->CI->load->library('ddrDb');
+			if (!$this->CI->ddrdb->copyTables($donorDb, $db)) return false;
 		}
 		
 		return true;
@@ -274,6 +282,10 @@ class Mods {
 		}
 		
 		if (!$this->_writeModsFile($fileData)) return false;
+		
+		$this->CI->load->library('ddrDb');
+		if (!$this->CI->ddrdb->deleteDatabase($mod)) return false;
+		
 		return true;
 	}
 	
@@ -312,40 +324,11 @@ class Mods {
 	
 	
 	
-	/**
-	 * @param 
-	 * @return 
-	 */
-	public function copyMod($donorDb = null, $targetDb = null) {
-		if (!$donorDb || !$targetDb) return false;
-		
-		$this->CI->load->dbutil();
-		
-		$this->CI->db->db_select($donorDb);
-		$backup = $this->CI->dbutil->backup([
-	        'format'		=> 'txt',
-	        'add_drop'		=> false,
-	        'add_insert'	=> !!$donorDb,
-	        'newline'		=> "\n"
-		]);
-		
-		$backup = str_replace('   ', ' ', preg_replace('/\n/', ' ', $backup));
-		$backup = array_values(array_filter(preg_split('/CREATE/', $backup)));
-		$this->CI->db->db_select($targetDb);
-		
-		foreach ($backup as $item) {
-			$createInsert = array_filter(preg_split('/INSERT INTO/', $item));
-			$create = array_shift($createInsert);
-			$this->CI->db->simple_query('CREATE '.trim($create));
-			if ($createInsert) {
-				foreach ($createInsert as $item) {
-					$this->CI->db->simple_query('INSERT INTO '.trim($item));
-				}
-			}
-		}
-		
-		return true;
-	}
+	
+	
+	
+	
+	
 	
 	
 	
@@ -388,14 +371,14 @@ class Mods {
 	 * @param 
 	 * @return 
 	 */
-	private function _writeModsFile($data = false) {
+	private function _writeModsFile($data = false, $create = false) {
 		if ($data === false) return false;
-		if (!file_exists(MODIFICATIONS_FILE)) return false;
+		if (!$create && !file_exists(MODIFICATIONS_FILE)) return false;
 		$dataToWrite = json_encode(arrBringTypes(array_values($data)));
-		
 		$fp = fopen(MODIFICATIONS_FILE, "w");
     	fwrite($fp, $dataToWrite);
     	fclose($fp);
+		
     	return true;
 	}
 	

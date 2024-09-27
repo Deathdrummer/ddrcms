@@ -1521,7 +1521,7 @@ class Admin extends MY_Controller {
 		if (!$this->input->is_ajax_request() || !$action) return false;
 		
 		$post = arrBringTypes($this->input->post());
-		$files = $this->input->files();
+		$filesData = $this->input->ddrFiles();
 		
 		switch ($action) {
 			case 'get_soc_item':
@@ -1533,11 +1533,6 @@ class Admin extends MY_Controller {
 				break;
 			
 			case 'get_callback_form':
-				$type = $post['type'];
-				
-				
-				//if (!$data = (isset($callbackform[$type]) ? $callbackform[$type] : false)) exit('');
-				
 				if (isset($post['product_id'])) {
 					$this->load->model('products_model', 'productsmodel');
 					$product = $this->productsmodel->getItem($post['product_id'], 'title, seo_url, main_image');
@@ -1550,11 +1545,7 @@ class Admin extends MY_Controller {
 				break;
 			
 			case 'send_email':
-				$type = $post['formType'];
-				$callbacksSetting = $this->settings->getSettings('callback');
 				$emailSetting = $this->settings->getSettings('email');
-				$callbackform = arrSetKeyFromField($callbacksSetting, 'id');
-				if (!$formData = (isset($callbackform[$type]) ? $callbackform[$type] : false)) exit('');
 				
 				foreach ($post as $field => $data) {
 					if (isJson($data)) {
@@ -1566,31 +1557,29 @@ class Admin extends MY_Controller {
 					}
 				}
 				
-				
 				if (!$to = ($formData['to'] ?? $emailSetting['to']) ?? false) {
 					toLog('Ошибка! Письмо не может быть отправлено, так как не указан адресат "to"!');
 					exit('');
 				}
 				
+				$subject = arrtakeItem($post, 'subject');
+				$title = arrtakeItem($post, 'title');
+				
 				$this->load->library('sendemail');
 				
 				$sendToAdmin = $this->sendemail->send([
 					'to'		=> $to,
-					'subject'	=> $formData['subject'] ?? $emailSetting['subject'],
+					'subject'	=> $subject ?: $emailSetting['subject'],
 					'template'	=> 'send.tpl',
-					'title'		=> $formData['title'] ?? '-',
+					'title'		=> $title ?: '-',
 					'fields'	=> $post,
-					'files'		=> $files,
+					'files'		=> $filesData,
 				]);
 				
 				if ($sendToAdmin) echo '1';
-				else toLog('Ошибка! Письмо для клиента по промокоду не отправилось!');
+				else toLog('Ошибка! Письмо не отправилось!');
 				break;
 			
-			case 'deactivate_promo':
-				$this->load->model('promo_model', 'promo');
-				if (!$this->promo->deactivate($post['id'])) exit('0');
-				echo '1';
 				
 			default:
 				break;
@@ -1647,6 +1636,7 @@ class Admin extends MY_Controller {
 				break;
 			
 			case 'set_modification':
+				
 				if (!$this->mods->setMod($post['controller'], $post['mod'])) exit('0');
 				echo '1';
 				break;
@@ -1671,12 +1661,17 @@ class Admin extends MY_Controller {
 	 */
 	public function get_page_template() {
 		if (!$this->input->is_ajax_request()) return false;
-		$pageData = file_get_contents('./public/views/site/index.tpl');
+		$layout = $this->input->post('layout');
 		
+		$pageData = file_get_contents('./public/views/site/'.$layout.'.tpl');
 		
-		$pageData = preg_replace("/\{\% from macro import .+ \%\}\R/", '', $pageData);
+		if ($layout == 'index') {
+			$pageData = preg_replace("/\{\% from macro import .+ \%\}\R/", '', $pageData);
+		}
+		
 		$pageData = str_replace("{% include cms %}", "", $pageData);
 		
+		//$pageData = str_replace("{% include site_scripts %}", "", $pageData);
 		
 		echo $pageData;
 	}
@@ -1689,14 +1684,45 @@ class Admin extends MY_Controller {
 	public function set_page_template() {
 		if (!$this->input->is_ajax_request()) return false;
 		$pageData = $this->input->post('data');
+		$layout = $this->input->post('layout');
 		
-		$pageData = "{% from macro import ".implode(', ', $this->macroFuncs)." %}\n".$pageData;
+		if ($layout == 'index') {
+			$pageData = "{% from macro import ".implode(', ', $this->macroFuncs)." %}\n".$pageData;
+		}
+		
 		$pageData = str_replace('</head>', "{% include cms %}</head>", $pageData);
 		
-		file_put_contents('./public/views/site/index.tpl', $pageData);
+		//$pageData = str_replace('</body>', "{% include site_scripts %}</body>", $pageData);
+		
+		file_put_contents('./public/views/site/'.$layout.'.tpl', $pageData);
 		echo 1;
 	}
 	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function get_mods() {
+		if (!$this->input->is_ajax_request()) return false;
+		$modsdata = $this->mods->getAllMods();
+		echo json_encode(array_column($modsdata, 'db'));
+	}
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function change_mod() {
+		if (!$this->input->is_ajax_request()) return false;
+		$modsdata = $this->mods->getAllMods();
+		echo json_encode(array_column($modsdata, 'db'));
+	}
 	
 	
 	
