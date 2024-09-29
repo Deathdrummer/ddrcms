@@ -69,6 +69,13 @@
 			<div class="header__item mr-auto">
 				<p>Административная панель</p>
 			</div>
+			<div class="header__item mr-4rem ml-auto">
+				<div class="buttons notop">
+					<button class="button small light" onclick="clearTwigCache()">Очистить кэш</button>
+				</div>
+				
+			</div>
+			
 			<div class="header__item mr-4rem">
 				<small class="d-block nowrap">Мод (админ):</small>
 				<div class="select">

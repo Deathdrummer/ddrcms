@@ -12,7 +12,7 @@ class MY_Model extends CI_Model {
 	public function __construct() {
 		parent::__construct();
 		
-		$this->mods->setBaseMod();  # создать файл, если его нет, записать туда дефолтный мод и установить куки
+		$this->mods->setBaseMod();  # создать файл, если его нет, записать туда дефолтный мод
 		
 		$this->mods->selectDb(); # выбрать базу данных исходя из активного мода в файле
 

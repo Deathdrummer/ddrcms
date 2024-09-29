@@ -573,6 +573,9 @@ class Admin extends MY_Controller {
 					$post['fields'] = json_encode(array_values($post['fields']));
 				}
 				if (!$insertId = $this->sections->save($post)) exit('0');
+				
+				$this->clearTwigCache();
+				
 				echo $this->twig->render($this->viewsPath.'render/sections/item.tpl', array_merge($return, ['id' => $insertId]));
 				break;
 			
@@ -586,11 +589,17 @@ class Admin extends MY_Controller {
 					$post['fields'] = json_encode(array_values($post['fields']));
 				}
 				if (!$this->sections->update($post)) exit('0');
+				
+				$this->clearTwigCache();
+				
 				echo $this->twig->render($this->viewsPath.'render/sections/item.tpl', $return);
 				break;
 			
 			case 'remove':
 				if (!$this->sections->remove($post['id'])) exit('0');
+				
+				$this->clearTwigCache();
+				
 				echo '1';
 				break;
 			
@@ -1580,11 +1589,21 @@ class Admin extends MY_Controller {
 				else toLog('Ошибка! Письмо не отправилось!');
 				break;
 			
+			case 'clear_cache':
+				echo $this->clearTwigCache();
+				break;
+			
 				
 			default:
 				break;
 		}
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -1636,7 +1655,6 @@ class Admin extends MY_Controller {
 				break;
 			
 			case 'set_modification':
-				
 				if (!$this->mods->setMod($post['controller'], $post['mod'])) exit('0');
 				echo '1';
 				break;
@@ -1651,6 +1669,18 @@ class Admin extends MY_Controller {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//------------------------------------------------------------------------------------------------------------
 	
 	
 	
@@ -1677,6 +1707,8 @@ class Admin extends MY_Controller {
 	}
 	
 	
+	
+	
 	/**
 	 * @param 
 	 * @return 
@@ -1695,6 +1727,9 @@ class Admin extends MY_Controller {
 		//$pageData = str_replace('</body>', "{% include site_scripts %}</body>", $pageData);
 		
 		file_put_contents('./public/views/site/'.$layout.'.tpl', $pageData);
+		
+		$this->clearTwigCache();
+		
 		echo 1;
 	}
 	
@@ -1724,6 +1759,30 @@ class Admin extends MY_Controller {
 		echo json_encode(array_column($modsdata, 'db'));
 	}
 	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function clearTwigCache() {
+		$directory = BASEPATH.'cache'.DIRECTORY_SEPARATOR.'twig';
+			
+		if (!is_dir($directory)) return false;
+		
+		$files = scandir($directory);
+		
+		foreach ($files as $file) {
+			if ($file !== '.' && $file !== '..') {
+				$filePath = $directory.DIRECTORY_SEPARATOR.$file;
+				if (is_file($filePath)) unlink($filePath);
+			}
+		}
+		return true;
+	}
 	
 	
 }

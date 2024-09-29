@@ -87,11 +87,12 @@ $(document).ready(function() {
 				$('#modForm').formSubmit({
 					url: 'admin/modifications/save',
 					dataType: 'html',
-					fields: {db: 'ddrcms_'+generateCode('llllnnn')},
+					fields: {generated_db: 'ddrcms_'+generateCode('llllnnn')},
 					before: function() {
 						newModificationWin.wait();
 					},
 					success: function(row, postData) {
+						console.log(postData);
 						if (row != 0) {
 							if ($('#modificationsList').children('tr.empty').length == 1) $('#modificationsList').children('tr.empty').remove();
 							$('#modificationsList').append(row);
@@ -206,8 +207,8 @@ $(document).ready(function() {
 		$.post('/admin/modifications/set_modification', {controller: 'site', mod: modName}, function(result) {
 			if (result) {
 				notify('Мод успешно изменен!');
-				$('#adminSetModifications').children('option:selected').prop('selected', false);
-				$('#adminSetModifications').children('option[value="'+modName+'"]').prop('selected', true);
+				//$('#adminSetModifications').children('option:selected').prop('selected', false);
+				//$('#adminSetModifications').children('option[value="'+modName+'"]').prop('selected', true);
 			}
 			else notify('Ошибка изменения мода!', 'error');
 		}, 'json').error((err) => {

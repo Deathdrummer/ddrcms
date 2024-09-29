@@ -194,6 +194,9 @@ class Mods {
 		if (!$post) return false;
 		$fileData = $this->_readModsFile();
 		
+		$generatedDb = arrtakeItem($post, 'generated_db');
+		$post['db'] = $post['db'] ?: $generatedDb;
+		
 		if (in_array($post['db'], array_column($fileData, 'db'))) return false;
 		
 		$donorDb = arrTakeItem($post, 'copy');
