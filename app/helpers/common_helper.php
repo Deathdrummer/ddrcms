@@ -28,7 +28,7 @@ if (!function_exists('toLog')) {
 
 
 
-if (! function_exists('ddrSplit')) {
+if (!function_exists('ddrSplit')) {
 	/**
 	 * Разделить строку
 	 * @param string $string  строка

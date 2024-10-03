@@ -71,6 +71,7 @@
 								<option value="file">Файл</option>
 								<option value="list">Список</option>
 								<optgroup label="Готовые данные">
+									<option value="sections">Секции</option>
 									<option value="catalog">Каталог</option>
 									<option value="categories">Категории</option>
 									<option value="pages">Страница</option>

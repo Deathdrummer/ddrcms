@@ -51,9 +51,6 @@ class Site extends MY_Controller {
 		if ($pageData) {
 			$settings = $this->settings->getSettings($preffixes, true) ?: [];
 
-			// Реструктурирование массива форм обратной связи
-			$settings['callback'] = isset($settings['callback']) ? arrSetKeyFromField($settings['callback'], 'id') : null;
-
 			// Вывод переменных для страниц
 			if (isset($settings['page_vars']) && is_array($settings['page_vars'])) {
 				$pagesVarsdata = [];
@@ -69,8 +66,7 @@ class Site extends MY_Controller {
 				}
 				$settings['page_vars'] = $pagesVarsdata;
 			}
-
-
+			
 
 			if ($sections) {
 				foreach ($sections as $sk => $section) {
@@ -266,17 +262,22 @@ class Site extends MY_Controller {
 
 
 			// Вывод модификаторов
-			$settings['modifications'] = $this->mods->getModsLabels();
-
+			$settings['mods'] = $this->mods->getModsLabels();
+			
+			
+			foreach ($settings as $tsKey => $stdata) {
+				$this->twig->addGlobal($tsKey, $stdata);
+			}
+			
 
 			$options = [
 				'svg_sprite'		=> getSprite(SPRITEPATH),
 				'controller'		=> $this->controllerName,
 				'sections'			=> $sections,
-				'header' 			=> $pageData['header'],
+				/* 'header' 			=> $pageData['header'],
 				'footer' 			=> $pageData['footer'],
 				'nav_mobile'		=> $pageData['nav_mobile'],
-				'scrolltop'			=> '#arrow',
+				'scrolltop'			=> '#arrow', */
 				'count_per_page'	=> $settings['count_products'] ?? 0,
 				'hosting'			=> isHosting()
 			];

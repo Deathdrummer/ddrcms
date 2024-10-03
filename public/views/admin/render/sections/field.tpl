@@ -140,6 +140,8 @@
 		<td></td>
 	{% elseif type == 'icons' %}
 		<td></td>
+	{% elseif type == 'sections' %}
+		<td></td>
 	{% endif %}
 	<td class="center">
 		<input type="hidden" name="fields[{{index}}][rules]" value="{{rules|json_encode()}}" fieldrulesdata>

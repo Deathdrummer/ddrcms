@@ -92,7 +92,6 @@ $(document).ready(function() {
 						newModificationWin.wait();
 					},
 					success: function(row, postData) {
-						console.log(postData);
 						if (row != 0) {
 							if ($('#modificationsList').children('tr.empty').length == 1) $('#modificationsList').children('tr.empty').remove();
 							$('#modificationsList').append(row);

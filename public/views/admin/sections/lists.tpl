@@ -106,7 +106,7 @@ $(document).ready(function() {
 			},
 			confirms: {
 				getList: function() {initEditors();},
-				add: function(item) {initEditors();},
+				add: function(item) {initEditors(); setBaseScripts();},
 				save: function(row) {initEditors();},
 				update: function(row) {initEditors();},
 				remove: function(row) {}

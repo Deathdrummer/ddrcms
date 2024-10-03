@@ -192,6 +192,11 @@ class Mods {
 	 */
 	public function add($post = false) {
 		if (!$post) return false;
+		
+		$this->CI->load->library('ddrDb');
+		
+		if (!$this->CI->ddrdb->createDatabase($post['db'])) return false;
+		
 		$fileData = $this->_readModsFile();
 		
 		$generatedDb = arrtakeItem($post, 'generated_db');
@@ -209,9 +214,6 @@ class Mods {
 		
 		if (!$this->_writeModsFile($fileData)) return false;
 		
-		$this->CI->load->library('ddrDb');
-		
-		$this->CI->ddrdb->createDatabase($post['db']);
 		
 		if ($donorDb) {
 			if (!$this->CI->ddrdb->copyTables($donorDb, $post['db'])) return false;

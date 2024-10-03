@@ -120,7 +120,7 @@
 				<thead>
 					<tr>
 						<td class="w-auto">Название</td>
-						<td title="Выводить в навигационном меню">Навиг.</td>
+						<td class="w-10rem" title="Выводить в навигационном меню">Навиг.</td>
 						<td class="w-14rem">Опции</td>
 					</tr>
 				</thead>
@@ -462,12 +462,12 @@ $(document).ready(function() {
 					return new Promise(async function(resolve, reject) {
 						try {
 							const navFile = {
-								index: 'codeNav',
-								not_found: 'notFound',
+								'index': 'codeNav',
+								'not_found': 'notFound',
 								'email/send': 'email'
 							};
 							
-							const codeNavData = await loadCodeNav(navFile[layout]);
+							const codeNavData = await ddrImport(`monaco_editor/${navFile[layout]}`);
 							addActions(codeNavData, true);
 							resolve();
 						} catch(e) {
@@ -975,7 +975,7 @@ $(document).ready(function() {
 					});
 				});
 				
-				$(newSectionWin.getSelector).on(tapEvent, '[copysectionvariable]', function() {
+				$(newSectionWin.getSelector).off(tapEvent, '[copysectionvariable]').on(tapEvent, '[copysectionvariable]', function() {
 					const variabledata = $(this).closest('.row').find('[variablefield]').val();
 					if (!variabledata) {
 						const field = $(this).closest('td').find('.field');
@@ -997,7 +997,7 @@ $(document).ready(function() {
 				
 				$('#codeSectionWait').removeClass('codelyout__info-visible');
 				
-				const codeNavData = await loadCodeNav('codeNav');
+				const codeNavData = await ddrImport('monaco_editor/codeNav');
 				addActions(codeNavData);
 				
 				fieldRulesTooltip = new jBox('Tooltip', toolTipOps);
@@ -1104,7 +1104,7 @@ $(document).ready(function() {
 					});
 				});
 				
-				$(updateSectionWin.getSelector).on(tapEvent, '[copysectionvariable]', function() {
+				$(updateSectionWin.getSelector).off(tapEvent, '[copysectionvariable]').on(tapEvent, '[copysectionvariable]', function() {
 					const variabledata = $(this).closest('.row').find('[variablefield]').val();
 					if (!variabledata) {
 						const field = $(this).closest('td').find('.field');
@@ -1130,9 +1130,8 @@ $(document).ready(function() {
 				
 				$('#codeSectionWait').removeClass('codelyout__info-visible');
 				
-				const codeNavData = await loadCodeNav('codeNav');
+				const codeNavData = await ddrImport('monaco_editor/codeNav');
 				addActions(codeNavData);
-				
 				
 				
 				fieldRulesTooltip = new jBox('Tooltip', toolTipOps);

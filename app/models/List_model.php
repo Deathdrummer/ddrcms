@@ -198,13 +198,15 @@ class List_model extends MY_Model {
 						
 					}	
 				} elseif (isset($i[3])) {
-					if ($values	= explode(',', $i[3])) {
+					if ($values	= ddrSplit($i[3], ',')) {
 						foreach ($values as $vk => $vi) {
-							$expval = explode(':', $vi);
-							if (count($expval) > 1) {
-								$v[$expval[0]] = $expval[1];
-								unset($values[$vk]); 
-							}
+							$expval = ddrSplit($vi, ':');
+							
+							$key = is_array($expval) && count($expval) > 1 ? $expval[0] : $expval;
+							$val = is_array($expval) && count($expval) > 1 ? $expval[1] : $expval;
+							
+							$v[$key] = $val;
+							unset($values[$vk]); 
 						}
 					}
 					$v = array_filter($v);

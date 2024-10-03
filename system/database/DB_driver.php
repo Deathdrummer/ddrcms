@@ -429,11 +429,14 @@ abstract class CI_DB_driver {
 			// We still don't have a connection?
 			if ( ! $this->conn_id)
 			{
+				
 				log_message('error', 'Unable to connect to the database');
 
 				if ($this->db_debug)
 				{
 					$this->display_error('db_unable_to_connect');
+				} else {
+					exit('<p>Нет подключения к базе данных: '.$this->database.'</p>');
 				}
 
 				return FALSE;

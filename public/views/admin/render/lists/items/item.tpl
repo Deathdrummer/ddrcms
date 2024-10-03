@@ -7,6 +7,7 @@
 						<input
 						type="text"
 						{% if field.rules %}rules="{{field.rules}}"{% endif %}
+						{% if field.mask %}mask="{{field.mask}}"{% endif %}	
 						autocomplete="off"
 						name="{{field.name}}"
 						value="{{attribute(_context, field.name)}}">

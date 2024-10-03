@@ -22,6 +22,8 @@
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/3.20.0/mode/xml/xml.js"></script>
 	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/codemirror/2.36.0/formatting.js"></script>
 	
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	
 	
 	<link rel="shortcut icon" href="{{base_url('public/images/favicon.png')}}" />
 	
@@ -35,7 +37,7 @@
 	<script src="{{base_url('public/js/functions.js')}}"></script>
 	<script src="{{base_url('public/js/common.js')}}"></script>
 	
-	<script src="{{base_url('public/js/plugins/code/loader.js')}}"></script>
+	<script src="{{base_url('public/js/vendor/code/loader.js')}}"></script>
 	
 	
 	<link rel="stylesheet" href="{{base_url('public/css/components.min.css')}}">

@@ -201,12 +201,12 @@ class MY_Controller extends CI_Controller {
             return $str . '?' . time();
         });
 
-        $this->twig->addFilter('sortby', function ($arr = false, $field = false) {
+        $this->twig->addFilter('sortby', function ($arr = false, $field = false, $order = 'asc') {
             if (!$arr || !$field) {
                 return false;
             }
 
-            return arrSortByField($arr, $field);
+            return arrSortByField($arr, $field, $order);
         });
 
         $this->twig->addFilter('sortbykey', function ($arr = [], $dir = 'asc') {

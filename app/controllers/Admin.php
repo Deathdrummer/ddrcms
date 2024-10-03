@@ -323,6 +323,30 @@ class Admin extends MY_Controller {
 										}
 										
 										
+										
+										
+										//---------------------------------- Добавить секции
+										if ($field['type'] == 'sections') {
+											$this->load->model('sections_model', 'sectionsmodel');
+											if ($sectionsData = $this->sectionsmodel->getAllSections()) {
+												$sectionsList = [];
+												foreach ($sectionsData as $item) {
+													$sectionsList[] = [
+														'value'	=> 'section'.$item['id'],
+														'title'	=> $item['title']
+													];
+												}
+											} else {
+												$sectionsList[] = [
+													'value'		=> '',
+													'title'		=> 'Нет секций',
+													'desabled'	=> 1
+												];
+											}
+											$pages[$pk]['sections'][$sk]['fields'][$fk]['data'] = $sectionsList;	
+										}
+										
+										
 										//---------------------------------- Добавить хэштеги
 										/*if ($field['type'] == 'hashtags') {
 											$pages[$pk]['sections'][$sk]['fields'][$fk]['data'] = [''];
@@ -354,9 +378,10 @@ class Admin extends MY_Controller {
 				$data['products'] = $this->productsmodel->get(false, true, false, false);
 				break;
 			
-			case 'lists':
+			case 'lists': # Здесть просто формируется таблица для списков, но сами списки все формируются через CRUD lists_items
 				$this->load->model('list_model', 'listsmodel');
 				if ($lists = $this->listsmodel->listsGet() ?: null) {
+					
 					foreach ($lists as $lk => $list) {
 						$fData = [];
 						if (isset($list['fields']) && !empty($list['fields'])) {
@@ -369,24 +394,14 @@ class Admin extends MY_Controller {
 								
 								if ($listInList && $i[0] == 'list' && !in_array($i[1], array_column($listInList, 'field'))) continue;
 								
-								if ($values	= isset($i[3]) ? ddrSplit($i[3], ',') : null) {
-                                    if (is_array($values)) {
-                                        foreach ($values as $vk => $vi) {
-                                            $expval = ddrSplit($vi, ':');
-                                            if (count($expval) > 1) {
-                                                $values[$expval[0]] = $expval[1];
-                                                unset($values[$vk]);
-                                            }
-                                        }
-                                    }
-								}
-								
 								$fData[] = isset($i[2]) ? $i[2] : null;
 							}
+							
 							$lists[$lk]['fields'] = $fData;
 						}
 					}
 				}
+				
 				$data['lists'] = $lists;
 				break;
 			
@@ -1769,18 +1784,27 @@ class Admin extends MY_Controller {
 	* @return 
 	*/
 	private function clearTwigCache() {
-		$directory = BASEPATH.'cache'.DIRECTORY_SEPARATOR.'twig';
-			
-		if (!is_dir($directory)) return false;
+		$rootDir = BASEPATH.'cache'.DIRECTORY_SEPARATOR.'twig';
+		if (!is_dir($rootDir)) return false;
 		
-		$files = scandir($directory);
-		
-		foreach ($files as $file) {
-			if ($file !== '.' && $file !== '..') {
-				$filePath = $directory.DIRECTORY_SEPARATOR.$file;
-				if (is_file($filePath)) unlink($filePath);
+		function _delete($directory) {
+			$files = scandir($directory);
+			foreach ($files as $file) {
+				if ($file !== '.' && $file !== '..') {
+					$filePath = $directory . DIRECTORY_SEPARATOR . $file;
+
+					if (is_dir($filePath)) {
+						_delete($filePath);
+						rmdir($filePath);
+					} else {
+						unlink($filePath);
+					}
+				}
 			}
 		}
+		
+		_delete($rootDir);
+		
 		return true;
 	}
 	

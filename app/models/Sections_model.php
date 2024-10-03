@@ -149,8 +149,12 @@ class Sections_model extends MY_Model {
 			$sort = $item['sort'];
 			
 			if ($item['navigation'] > 0) {
-				$item['data']['section_id'] = 'section'.ucfirst($item['filename']).$item['page_section_id'];
+				$item['data']['section_id'] = 'section'.$item['section_id'];
+				$item['data']['section_page_id'] = 'section'.$item['page_section_id'];
+				$item['data']['section_file'] = $item['filename'];
 			}
+			
+			
 			
 			unset($item['sort'], $item['settings'], $item['navigation']);
 			$postSections[$sort] = $item;
@@ -172,7 +176,7 @@ class Sections_model extends MY_Model {
 	 */
 	public function getPageSectionsToNav($pageId = false) {
 		if (!$pageId) return false;
-		$this->db->select('s.filename, s.title, ps.id AS page_section_id, ps.navigation_title');
+		$this->db->select('s.filename, s.title, ps.id AS page_section_id, ps.section_id, ps.navigation_title');
 		$this->db->where(['ps.navigation !=' => '0', 'ps.page_id' => $pageId]);
 		$this->db->join('sections s', 's.id = ps.section_id');
 		$this->db->order_by('ps.navigation', 'ASC');
@@ -181,7 +185,9 @@ class Sections_model extends MY_Model {
 		foreach ($result as $item) {
 			$data[] = [
 				'title' 			=> $item['navigation_title'] ?: $item['title'],
-				'section_id' 	=> 'section'.ucfirst($item['filename']).$item['page_section_id'],
+				'section_id' 		=> 'section'.$item['section_id'],
+				'section_page_id' 	=> 'section'.$item['page_section_id'],
+				'section_file' 		=> $item['filename'],
 			];
 		}
 		return $data;

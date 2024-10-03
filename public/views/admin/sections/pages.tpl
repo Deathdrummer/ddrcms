@@ -159,6 +159,12 @@
 														'v': 2,
 														'data': [{'name': field.variable}]
 													} %}
+												{% elseif field.type == 'sections' %}	
+													{% include form~'select.tpl' with {
+														'label': field.label,
+														'name': sData.varname~'|sections|'~field.variable,
+														'data': field.data,
+													} %}
 												{% endif %}
 											{% endfor %}
 										</table>

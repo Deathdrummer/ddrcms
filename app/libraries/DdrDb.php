@@ -21,6 +21,23 @@ class DdrDb {
 	
 	
 	/**
+	* Создать БД
+	* @param 
+	* @return 
+	*/
+	public function createDatabase($dbName = null) {
+		if (!$dbName) return false;
+
+		// Выполняем запрос на создание базы данных
+		$result = $this->CI->db->query("CREATE DATABASE IF NOT EXISTS " . $this->CI->db->escape_identifiers($dbName));
+
+		// Возвращаем true, если база данных успешно создана
+		return $result;
+	}
+	
+	
+	
+	/**
 	* Добавить пустые таблицы в БД
 	* @param 
 	* @return 
@@ -128,20 +145,6 @@ class DdrDb {
 		return true;
 	} */
 	
-	
-	
-	
-	
-	
-	public function createDatabase($dbName = null) {
-		if (!$dbName) return false;
-
-		// Выполняем запрос на создание базы данных
-		$result = $this->CI->db->query("CREATE DATABASE IF NOT EXISTS " . $this->CI->db->escape_identifiers($dbName));
-
-		// Возвращаем true, если база данных успешно создана
-		return $result;
-	}
 	
 	
 	
