@@ -10,7 +10,7 @@
 			name="fields"
 			rules="empty|string" 
 			rows="3"
-			ddrtextarealist="select;тип;text:однострочное поле,number:числовое поле,date:поле даты,checkbox:чекбокс,select:выпад. список,textarea:многострочное поле,file:файл,category:категория,product:продукт,list:список;w-10|text;имя поля;;w-15|text;лейбл;;w-15|text;значения|text;правила|text;маска"
+			ddrtextarealist="select;тип;text:однострочное поле,number:числовое поле,date:поле даты,checkbox:чекбокс,select:выпад. список,textarea:многострочное поле,file:файл,category:категория,product:продукт,list:список;w-10|text;имя поля;;w-15|text;лейбл;;w-15|text;значения|text;правила|text;маска;;;^ - цифра & - буква * - любой символ"
 			join=";"
 			load="list|admin/lists/get|test">{{fields}}</textarea>
 		</div>

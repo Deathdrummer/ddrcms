@@ -225,7 +225,51 @@
 				<div class="tabscontent">
 					{% for page in all_pages %}
 						<div tabid="subTabPage{{page.id}}">
-							{% include form~'textarea.tpl' with {'label': 'Переменные', 'rows': 10, 'name': 'setting_page_vars|'~page.id, 'cls': 'w-60rem'} %}
+							<table class="fieldset">
+								<tbody>
+									<tr>
+										<td class="default">Переменые страниц</td>
+										<td>
+											<table>
+												<thead>
+													<tr>
+														<td class="w-30rem">Переменная</td>
+														<td class="w-auto">Значение</td>
+														<td class="w-60px">Опции</td>
+													</tr>
+												</thead>
+												<tbody id="pageVarsList">
+													{% if setting_page_vars[page.id] %}
+														{% for index, item in setting_page_vars[page.id] %}
+															{% include 'views/admin/render/common/page_vars_item.tpl' with {page_id: page.id, index: index, item: item} %}
+														{% endfor %}
+													{% else %}
+														<tr class="empty">
+															<td colspan="3"><p class="empty center">Нет данных</p></td>
+														</tr>
+													{% endif %}
+												</tbody>
+												<tfoot>
+													<tr>
+														<td colspan="3">
+															<div class="buttons right notop">
+																<button class="small alt" id="addPageVar" pageid="{{page.id}}">Добавить</button>
+															</div>
+														</td>
+													</tr>
+												</tfoot>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+							
+							
+							
+							
+							
+							
+							{# {% include form~'textarea.tpl' with {'label': 'Переменные', 'rows': 10, 'name': 'setting_page_vars|'~page.id, 'cls': 'w-60rem'} %} #}
 						</div>
 					{% endfor %}
 				</div>
@@ -265,6 +309,32 @@ $(document).ready(function() {
 		$(this).closest('tr').remove();
 	});
 	
+	
+	
+	
+	
+	
+	
+	// ---------------------------------------- Переменный страниц
+	$('#addPageVar').on(tapEvent, function() {
+		let index = $('#pageVarsList').find('tr:not(.empty):last').attr('index') || 0,
+			pageId = $(this).attr('pageid');
+		
+		getAjaxHtml('admin/common/get_page_var_item', {page_id: pageId, index: parseInt(index) + 1}, function(html) {
+			let emptyRow = $('#pageVarsList').find('tr.empty');
+			if (emptyRow.length) {
+				$(emptyRow).remove();
+			}
+			$('#pageVarsList').append(html);
+		}, function() {
+			
+		});
+	});
+	
+	
+	$('#pageVarsList').on(tapEvent, '[removevar]', function() {
+		$(this).closest('tr').remove();
+	});
 	
 	
 	

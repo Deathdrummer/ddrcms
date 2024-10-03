@@ -50,19 +50,15 @@ class Site extends MY_Controller {
 
 		if ($pageData) {
 			$settings = $this->settings->getSettings($preffixes, true) ?: [];
-
+			
+			
 			// Вывод переменных для страниц
-			if (isset($settings['page_vars']) && is_array($settings['page_vars'])) {
+			if (isset($settings['page_vars'][$pageData['page_id']]) && is_array($settings['page_vars'][$pageData['page_id']])) {
 				$pagesVarsdata = [];
-				foreach ($settings['page_vars'] as $pageId => $varsData) {
-					if (!$varsData = ddrSplit($varsData, "\n", ':')) continue;
-					if (!is_array($varsData)) continue;
-					foreach ($varsData as $pair) {
-						if (!$key = isset($pair[0]) ? $pair[0] : false) continue 2;
-						$value = isset($pair[1]) ? $pair[1] : null;
-
-						$pagesVarsdata[$pageId][$key] = $value;
-					}
+				
+				foreach ($settings['page_vars'][$pageData['page_id']] as $varData) {
+					if (!isset($varData['variable']) || !isset($varData['value'])) continue;
+					$pagesVarsdata[$varData['variable']] = $varData['value'];
 				}
 				$settings['page_vars'] = $pagesVarsdata;
 			}
@@ -283,6 +279,7 @@ class Site extends MY_Controller {
 			];
 
 			$mainData = array_filter(array_merge($pageData, $settings, $options)) ?: [];
+			
 			
 			if ($mainData['seo_url'] == 'index') $mainData['seo_url'] = '';
 

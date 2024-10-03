@@ -1556,6 +1556,10 @@ class Admin extends MY_Controller {
 				echo $this->twig->render($this->viewsPath.'render/common/callback_item.tpl', ['index' => $post['index']]);
 				break;
 			
+			case 'get_page_var_item':
+				echo $this->twig->render($this->viewsPath.'render/common/page_vars_item.tpl', ['page_id' => $post['page_id'], 'index' => $post['index']]);
+				break;
+			
 			case 'get_callback_form':
 				if (isset($post['product_id'])) {
 					$this->load->model('products_model', 'productsmodel');
