@@ -104,10 +104,22 @@ $(document).ready(function() {
 	
 	
 	
-	$('#filemanagerDirs').on(tapEvent, '[directory]:not(.disabled):not(.active)', function() {
-		var thisDirectory = $(this).attr('directory'); 
+	$('#filemanagerDirs').on(tapEvent, '[directory]:not(.disabled)', function() {
+		const thisDirectory = $(this).attr('directory'),
+			parentDirs = thisDirectory.split('/'); 
+		
+		if ($('#currentDir').val() == thisDirectory) return;
+		
 		$('#filemanagerDirs').find('[directory]').removeClass('active');
+		
+		const dirsAccum = [];
+		parentDirs.slice(0, -1).forEach((dir) => {
+			dirsAccum.push(dir);
+			$('#filemanagerDirs').find(`[directory="${dirsAccum.join('/')}"]`).addClass('active');
+		});
+			
 		$(this).addClass('active');
+		
 		$('#removeFiles, #replaceFiles').prop('disabled', true);
 		$('#editFolder, #removeFolder').prop('disabled', false);
 		$('#currentDir').val(thisDirectory);
@@ -124,7 +136,7 @@ $(document).ready(function() {
 	
 	
 	$('#newFolder').on(tapEvent, function() {
-		let activeDir = $('#filemanagerDirs').find('[directory].active').attr('directory') || false;
+		let activeDir = $('#filemanagerDirs').find('[directory].active').last().attr('directory') || false;
 		
 		ddrPopUp({
 			title: 'Новая директория|4',
@@ -407,7 +419,7 @@ $(document).ready(function() {
 					},
 					success: function(response) {
 						if (response) {
-							var activeDirectory = $('#filemanagerDirs').find('[directory].active').attr('directory');
+							var activeDirectory = $('#filemanagerDirs').find('[directory].active').last().attr('directory');
 							getAjaxHtml('filemanager/files_get', {directory: activeDirectory}, function(html) {
 								$('#filemanagerContentFiles').html(html);
 								$('#newFolder, #editFolder, #removeFolder, #fileUploadFormButton, #setWidthHeight, #setWoterMark').prop('disabled', false);
@@ -659,7 +671,7 @@ $(document).ready(function() {
 				}
 			},
 			complete: function() {
-				var activeDirectory = $('#filemanagerDirs').find('[directory].active').attr('directory');
+				var activeDirectory = $('#filemanagerDirs').find('[directory].active').last().attr('directory');
 				getAjaxHtml('filemanager/files_get', {directory: activeDirectory}, function(html) {
 					$('#filemanagerContentFiles').html(html);
 					$('#removeFiles, #replaceFiles, #newFolder, #editFolder, #removeFolder, #fileUploadFormButton, #setWidthHeight').prop('disabled', false);

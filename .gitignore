@@ -1,0 +1,5 @@
+/gulp/node_modules
+/gulp/package-lock.json
+/system/cache
+/system/logs
+/mods.json

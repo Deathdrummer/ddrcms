@@ -8,8 +8,8 @@ class MY_Controller extends CI_Controller {
     protected $weekShort = [1 => 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
     protected $minutes;
     protected $dataAccess;
-    protected $imgFileExt = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico'];
-    protected $allowedTypes = ['png', 'jpg', 'jpeg', 'jpe', 'gif', 'ico', 'bmp', 'svg', 'psd', 'rar', 'zip', 'mp4', 'mov', 'avi', 'mpeg', 'txt', 'rtf', 'djvu', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'mp3', 'wma', 'wmv', 'sql', 'gltf', 'glb', 'bin', 'css', 'js'];
+    protected $imgFileExt = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'webp', 'apng'];
+    protected $allowedTypes = ['png', 'jpg', 'jpeg', 'jpe', 'gif', 'ico', 'bmp', 'svg', 'psd', 'rar', 'zip', 'mp4', 'mov', 'avi', 'mpeg', 'txt', 'rtf', 'djvu', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'mp3', 'wma', 'wmv', 'sql', 'gltf', 'glb', 'bin', 'css', 'js', 'woff', 'woff2', 'ttf', 'eot', 'otf', 'map', 'json'];
     protected $controllerName;
 
     public function __construct() {
