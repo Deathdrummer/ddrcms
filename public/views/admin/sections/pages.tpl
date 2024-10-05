@@ -212,6 +212,7 @@ $(document).ready(function() {
 		pos: 500// $('#settingsSave').offset().top - 15
 	});
 	
+	
 	// --------------------------------------------------------------------------------------- Сохранение основных настроек
 	$('#pagesSave').on(tapEvent, function() {
 		$('#pages').formSubmit({
