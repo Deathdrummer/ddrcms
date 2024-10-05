@@ -67,18 +67,25 @@ class Sections_model extends MY_Model {
 	 */
 	public function update($data = false) {
 		if (!$data) return false;
-		$sectionId = $data['id'];
-		unset($data['id']);
-		$sectionCode = $data['code'];
-		unset($data['code']);
+		
+		$sectionId = arrTakeItem($data, 'id');
+		$sectionCode = arrTakeItem($data, 'code');
 		
 		$this->db->where('id', $sectionId);
 		if (!$this->db->update('sections', $data)) return false;
+		
+		$sectionsSettingsFields = $this->_getSectionsSettingsParams($sectionId, $data['filename']);
+		
+		$this->_updatePageSectionSettings($data['fields'], $sectionsSettingsFields); #если у секции измеились переменные - то обновляем их в settings, чтобы убрать удаленные переменные
 		
 		@file_put_contents('./public/views/site/sections/'.$data['filename'].'.tpl', $sectionCode);
 		
 		return true;
 	}
+	
+	
+	
+	
 	
 	
 	
@@ -133,13 +140,13 @@ class Sections_model extends MY_Model {
 	 * @param 
 	 * @return 
 	 */
-	public function getPageSections($pageId = false, $title = false) {
+	public function getPageSections($pageId = false, $title = false, $withHidden = false) {
 		if (!$pageId) return false;
 		$this->db->select('s.filename, s.title, ps.id AS page_section_id, ps.section_id, ps.sort, ps.navigation, ps.settings');
 		if ($title) $this->db->select('s.title');
 		$this->db->join('sections s', 's.id = ps.section_id');
 		$this->db->where('ps.page_id', $pageId);
-		$this->db->where('ps.showsection', 1);
+		if (!$withHidden) $this->db->where('ps.showsection', 1);
 		$query = $this->db->get('pages_sections ps');
 		if (!$result = $query->result_array()) return false;
 		
@@ -174,6 +181,30 @@ class Sections_model extends MY_Model {
 	 * @param 
 	 * @return 
 	 */
+	public function getPageSection($pageSectioUId = false) {
+		if (!$pageSectioUId) return false;
+		$this->db->select('s.filename, s.title, ps.id AS page_section_id, ps.section_id, ps.page_id, ps.settings, ps.uid');
+		$this->db->join('sections s', 's.id = ps.section_id');
+		$this->db->where('ps.uid', $pageSectioUId);
+		if (!$sectionData = $this->_row('pages_sections ps')) return false;
+		
+		$sectionData['data'] = json_decode($sectionData['settings'], true) ?: [];
+		unset($sectionData['settings']);
+
+		return $sectionData;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @param 
+	 * @return 
+	 */
 	public function getPageSectionsToNav($pageId = false) {
 		if (!$pageId) return false;
 		$this->db->select('s.filename, s.title, ps.id AS page_section_id, ps.section_id, ps.navigation_title');
@@ -196,5 +227,77 @@ class Sections_model extends MY_Model {
 	
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	#--------------------------------------------------------------------------------------------------------------
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _updatePageSectionSettings($dataFields = null, $sectionsSettingsFields = null) {
+		if (is_null($sectionsSettingsFields)) return false;
+		
+		$fields = $dataFields ? array_column(json_decode($dataFields, true), 'variable') : [];
+		
+		$this->db->where_in('param', $sectionsSettingsFields);
+		
+		if (!$sSFieldsResult = $this->_result('settings')) return false;
+		
+		foreach ($sSFieldsResult as $k => $row) {
+			$rowValues = json_decode($row['value'], true);
+			
+			if (!$rowValues) {
+				$sSFieldsResult[$k]['value'] = null;
+				continue;
+			}
+			
+			$newValues = array_filter($rowValues, function($key) use($fields) {
+				return in_array($key, $fields) ;
+			}, ARRAY_FILTER_USE_KEY);
+			
+			$sSFieldsResult[$k]['value'] = $newValues ? json_encode($newValues, JSON_UNESCAPED_UNICODE) : null;
+		}
+		
+		$this->db->update_batch('settings', $sSFieldsResult, 'id');
+	}
+	
+	
+	
+	
+	
+	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	private function _getSectionsSettingsParams($sectionId = null, $filename = null) {
+		if (!$sectionId || !$filename) return false;
+		
+		$this->db->select('id, page_id, section_id');
+		$this->db->where('section_id', $sectionId);
+		$pageSections = $this->_result('pages_sections');
+		
+		$sectionsSettings = [];
+		foreach ($pageSections as $row) {
+			$sectionsSettings[] = 'page'.$row['page_id'].'_'.$filename.$row['id'];
+		}
+		
+		return $sectionsSettings;
+	}
 	
 }

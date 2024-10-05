@@ -144,6 +144,8 @@ class Admin extends MY_Controller {
 				$this->load->model('pages_model', 'pages');
 				$data['all_pages'] = $this->pages->get();
 				
+				array_unshift($data['all_pages'], ['id' => 'all', 'page_title' => 'Все страницы']);
+				
 				$data['navigations'] = [
 					'Страницы' 	=> [],
 					'Секции' 	=> [],
@@ -490,7 +492,7 @@ class Admin extends MY_Controller {
 			case 'get_sections':
 				$this->load->model('sections_model', 'sectionsmodel');
 				$allSections = $this->sectionsmodel->getAllSections();
-				$pageSections = $this->sectionsmodel->getPageSections($post['page_id'], true);
+				$pageSections = $this->sectionsmodel->getPageSections($post['page_id'], true, true);
 				echo $this->twig->render($this->viewsPath.'render/pages/page_sections.tpl', ['all_sections' => $allSections, 'page_sections' => $pageSections, 'page_title' => $post['page_title']]);
 				break;
 			
@@ -533,7 +535,6 @@ class Admin extends MY_Controller {
 	
 	
 	
-	
 	/**
 	 * Работа с секциями
 	 * @param 
@@ -560,6 +561,7 @@ class Admin extends MY_Controller {
 			'catalog' 		=> 'Каталог',
 			'categories'	=> 'Категории',
 			'pages'			=> 'Страницы',
+			'sections'		=> 'Секции',
 			'hashtags'		=> 'Хэштеги',
 			'options'		=> 'Опции',
 			'icons'			=> 'Значки'
@@ -585,7 +587,7 @@ class Admin extends MY_Controller {
 					foreach ($post['fields'] as $k => $field) {
 						if (isset($field['rules'])) $post['fields'][$k]['rules'] = json_decode($field['rules'], true);
 					}
-					$post['fields'] = json_encode(array_values($post['fields']));
+					$post['fields'] = json_encode(array_values($post['fields']), JSON_UNESCAPED_UNICODE);
 				}
 				if (!$insertId = $this->sections->save($post)) exit('0');
 				
@@ -601,7 +603,7 @@ class Admin extends MY_Controller {
 					foreach ($post['fields'] as $k => $field) {
 						if (isset($field['rules'])) $post['fields'][$k]['rules'] = json_decode($field['rules'], true);
 					}
-					$post['fields'] = json_encode(array_values($post['fields']));
+					$post['fields'] = json_encode(array_values($post['fields']), JSON_UNESCAPED_UNICODE);
 				}
 				if (!$this->sections->update($post)) exit('0');
 				
@@ -1404,7 +1406,7 @@ class Admin extends MY_Controller {
 				$insert['--sort'] = $post['fields']['--sort'];
 				$insert['list_id'] = $post['list_id'];
 				unset($post['fields']['--sort'], $post['fields_to_item']['--sort']);
-				$insert['data'] = json_encode($post['fields']);
+				$insert['data'] = json_encode($post['fields'], JSON_UNESCAPED_UNICODE);
 				unset($post['fields']);
 				
 				$fieldsToItem = $post['fields_to_item'];

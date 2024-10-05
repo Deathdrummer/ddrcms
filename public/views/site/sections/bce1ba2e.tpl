@@ -1,0 +1,1 @@
+<p>hello! {{sections.mysection}}</p>

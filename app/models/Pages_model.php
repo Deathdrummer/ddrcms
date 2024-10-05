@@ -100,6 +100,23 @@ class Pages_model extends MY_Model {
 	
 	
 	
+	/**
+	* 
+	* @param 
+	* @return 
+	*/
+	public function getPageIdByUrl($url = null) {
+		$this->db->select('id, seo_url');
+		$this->db->where('seo_url', $url);
+		if (!$pageId = $this->_row('pages', 'id')) return false;
+		return $pageId;
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -262,7 +279,7 @@ class Pages_model extends MY_Model {
 	 */
 	public function getPageSectionSettings($psid = false) {
 		if (!$psid) return false;
-		$this->db->select('id AS psid, navigation, navigation_title, showsection, settings');
+		$this->db->select('id AS psid, navigation, navigation_title, showsection, settings, uid');
 		$this->db->where('id', $psid);
 		$query = $this->db->get('pages_sections');
 		if (!$result = $query->row_array()) return false;
@@ -437,7 +454,10 @@ class Pages_model extends MY_Model {
 		$update = []; $new = false;
 		foreach ($data as $item) {
 			if ($item['id']) $update[] = $item;
-			else $new = $item;
+			else {
+				$item['uid'] = generateCode('lnnnlll');
+				$new = $item;
+			} 
 		}
 		
 		if ($update) $this->db->update_batch('pages_sections', $update, 'id');

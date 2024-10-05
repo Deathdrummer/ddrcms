@@ -22,6 +22,10 @@
 					{% endif %}
 					
 					
+					{% if default %}
+						<option selected disabled>{{default}}</option>
+					{% endif %}
+					
 					{% for k, item in data %}
 						{% if multiple %}
 							<option{% if item.value in value %} selected{% endif %}{% if item.desabled %} desabled{% endif %} value="{{item.value}}">{{item.title}}</option>

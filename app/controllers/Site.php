@@ -51,11 +51,14 @@ class Site extends MY_Controller {
 		if ($pageData) {
 			$settings = $this->settings->getSettings($preffixes, true) ?: [];
 			
-			
 			// Вывод переменных для страниц
+			$pagesVarsdata = [];
+			foreach ($settings['page_vars']['all'] as $varData) {
+				if (!isset($varData['variable']) || !isset($varData['value'])) continue;
+				$pagesVarsdata[$varData['variable']] = $varData['value'];
+			}
+			
 			if (isset($settings['page_vars'][$pageData['page_id']]) && is_array($settings['page_vars'][$pageData['page_id']])) {
-				$pagesVarsdata = [];
-				
 				foreach ($settings['page_vars'][$pageData['page_id']] as $varData) {
 					if (!isset($varData['variable']) || !isset($varData['value'])) continue;
 					$pagesVarsdata[$varData['variable']] = $varData['value'];

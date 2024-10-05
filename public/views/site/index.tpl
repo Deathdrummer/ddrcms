@@ -6,5 +6,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 {% include cms %}</head>
 <body class="{{page_vars.foo}}">
+<div id="ddrTest"></div>
 </body>
 </html>

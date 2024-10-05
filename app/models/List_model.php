@@ -347,8 +347,9 @@ class List_model extends MY_Model {
 		$tableFields = json_decode($row['data'], true);
 		$tableFields = array_intersect_key($tableFields, $fields);
 		$newData = array_replace($tableFields, $fields);
+		
 		$this->db->where('id', $id);
-		if (!$this->db->update('lists_items', ['data' => json_encode($newData)])) return false;
+		if (!$this->db->update('lists_items', ['data' => json_encode($newData, JSON_UNESCAPED_UNICODE)])) return false;
 		return true; 
 	}
 	

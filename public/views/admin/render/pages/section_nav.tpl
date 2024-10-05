@@ -2,13 +2,13 @@
 	<thead>
 		<tr>
 			<td colspan="2">
-				<h3 class="text-center py-3px">Отображение в меню</h3>
+				<h3 class="text-center py-3px">Настройки секции</h3>
 			</td>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td class="w-35 text-right"><div><span>Сортировка:</span></div></td>
+			<td class="w-35 text-right"><div><span>Сортировка в навигационном меню:</span></div></td>
 			<td>
 				<input type="hidden" name="psid" value="{{psid}}">
 				<div class="field w-13rem mt-16px mb-5px">
@@ -40,6 +40,12 @@
 						</div>
 					</div>
 				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="w-35 text-right"><div><span>Уникальный ID секции:</span></div></td>
+			<td>
+				<code class="fz16px color-blue color-blue-pointer" title="Скопировать ID" onclick="copyStringToClipboard('{{uid}}', 'ID скопирован!')">{{uid}}</code>
 			</td>
 		</tr>
 		{#<tr>

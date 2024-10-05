@@ -81,7 +81,8 @@
 														'label': field.label,
 														'name': sData.varname~'|'~field.variable,
 														'data': field.data,
-														'rules': field.rules
+														'rules': field.rules,
+														'default': 'Выберите вариант',
 													} %}
 												{% elseif field.type == 'checkbox' %}
 													{% include form~'checkbox.tpl' with {
@@ -110,7 +111,8 @@
 															'label': field.label,
 															'name': sData.varname~'|list|'~field.variable,
 															'data': field.data,
-															'rules': field.rules
+															'rules': field.rules,
+															'default': 'Выберите вариант',
 														} %}
 													</tr>
 												{% elseif field.type == 'catalog' %}	
@@ -164,6 +166,7 @@
 														'label': field.label,
 														'name': sData.varname~'|sections|'~field.variable,
 														'data': field.data,
+														'default': 'Выберите вариант',
 													} %}
 												{% endif %}
 											{% endfor %}

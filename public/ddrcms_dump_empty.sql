@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS `pages_sections` (
   `showsection` int NOT NULL DEFAULT '1',
   `sort` int DEFAULT '0',
   `settings` text,
+  `uid` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3 COMMENT='привязка секций к старницам';
 

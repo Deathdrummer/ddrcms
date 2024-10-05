@@ -302,7 +302,7 @@ if (!function_exists('arrBringTypes')) {
 	/**
 	 * Приводит типы данных элементов массива (стар. bringTypes)
 	 * @param массив
-	 * @return массив
+	 * @return array
 	*/
 	function arrBringTypes($inpData = false) {
 		if(empty($inpData)) return false;

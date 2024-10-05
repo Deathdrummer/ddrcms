@@ -67,8 +67,16 @@ class Log extends MY_Controller {
 	
 	
 	private function isJson($string) {
+		// Быстрая проверка, если строка не начинается с { или [
+		if (!is_string($string) || (strlen($string) < 2)) {
+			return false;
+		}
+		
+		// Попытка декодировать JSON
 		json_decode($string);
-		return (json_last_error() == JSON_ERROR_NONE);
+		
+		// Проверяем, была ли ошибка
+		return json_last_error() === JSON_ERROR_NONE;
 	}
 	
 	
