@@ -57,11 +57,30 @@
 
 <script type="text/javascript"><!--
 $(document).ready(function() {
-	function renderDirs(callback, newPath) {
-		var currentDir = $('#currentDir').val();
+	
+	function renderDirs(callback, newPath = null) {
+		
+		let currentDir = newPath || $('#currentDir').val(),
+			parentDirs = currentDir.split('/');
+			
 		getAjaxHtml('filemanager/dirs_get', {current_dir: currentDir}, function(html) {
 			$('#filemanagerDirs').html(html);
-			if (newPath) $('#filemanagerDirs').find('[directory="'+newPath+'"]').addClass('active');
+			
+			if (parentDirs) {
+				const dirsAccum = [];
+				parentDirs.slice(0, -1).forEach((dir) => {
+					dirsAccum.push(dir);
+					$('#filemanagerDirs').find(`[directory="${dirsAccum.join('/')}"]`).addClass('active');
+				});
+			}
+				
+			
+			//dirsAccum.push(dir);
+			//$('#filemanagerDirs').find(`[directory="${dirsAccum.join('/')}"]`).addClass('active');
+			
+			
+			
+			$('#filemanagerDirs').find('[directory="'+currentDir+'"]').addClass('active');
 			if (callback && typeof callback == 'function') callback();
 		});
 	}
@@ -112,11 +131,14 @@ $(document).ready(function() {
 		
 		$('#filemanagerDirs').find('[directory]').removeClass('active');
 		
-		const dirsAccum = [];
-		parentDirs.slice(0, -1).forEach((dir) => {
-			dirsAccum.push(dir);
-			$('#filemanagerDirs').find(`[directory="${dirsAccum.join('/')}"]`).addClass('active');
-		});
+		if (parentDirs) {
+			const dirsAccum = [];
+			parentDirs.slice(0, -1).forEach((dir) => {
+				dirsAccum.push(dir);
+				$('#filemanagerDirs').find(`[directory="${dirsAccum.join('/')}"]`).addClass('active');
+			});
+		}
+			
 			
 		$(this).addClass('active');
 		
@@ -165,11 +187,19 @@ $(document).ready(function() {
 							} else if (response == 2) {
 								notify('Такая директория уже существует!', 'info');
 								newFolderWin.wait(false);
-							} else if (response == 1) {
+							} else if (typeof response == 'string') {
 								notify('Директория успешно создана!');
+								
+								$('#filemanagerFormPath, #currentDir').val(activeDir+'/'+response);
+								
 								renderDirs(function() {
 									newFolderWin.close();
-								});
+								}, activeDir+'/'+response);
+								
+								//$('#fileUploadFormButton, #setWidthHeight, #setWoterMark').prop('disabled', true);
+								$('#filemanagerContentFiles').html('<p class="empty center">Нет данных</p>');
+								
+								
 							} else {
 								notify('Ошибка создания директории!', 'error');
 							}
@@ -190,7 +220,8 @@ $(document).ready(function() {
 	
 	
 	$('#editFolder').on(tapEvent, function() {
-		var currentFolder = $('#filemanagerDirs').find('[directory].active');
+		var currentFolder = $('#filemanagerDirs').find('[directory].active').last();
+		
 		if (currentFolder.length == 0) {
 			notify('Не выбрано ни одной директории!', 'error');
 			return false;
@@ -254,7 +285,10 @@ $(document).ready(function() {
 	
 	
 	$('#removeFolder').on(tapEvent, function() {
-		var currentFolder = $('#filemanagerDirs').find('[directory].active');
+		var currentFolder = $('#filemanagerDirs').find('[directory].active').last(),
+			parentFolder = $('#filemanagerDirs').find('[directory].active').eq(-2);
+			
+		
 		if (currentFolder.length == 0) {
 			notify('Не выбрано ни одной директории!', 'error');
 			return false;
@@ -277,15 +311,29 @@ $(document).ready(function() {
 		}, function(removeDirWin) {
 			$('#removeDir').on(tapEvent, function() {
 				removeDirWin.wait();
+				const pDir = parentFolder.attr('directory');
+				
 				$.post('/filemanager/dirs_remove', {path: dirPath}, function(response) {
 					if (response) {
 						notify('Директория успешно удалена!');
+						
+						$('#filemanagerFormPath').val(pDir || null);
+						
 						renderDirs(function() {
-							$('#editFolder, #removeFolder, #replaceFiles, #removeFiles').prop('disabled', true);
+							$('#replaceFiles, #removeFiles').prop('disabled', true);
+							if (!pDir) {
+								$('#editFolder, #removeFolder').prop('disabled', true);
+								$('#fileUploadFormButton, #setWidthHeight, #setWoterMark').prop('disabled', true);
+								$('#filemanagerContentFiles').html('<p class="empty center">Выберите раздел</p>');
+							} else {
+								getAjaxHtml('filemanager/files_get', {directory: pDir}, function(html) {
+									$('#filemanagerContentFiles').html(html);
+									$('#fileUploadFormButton, #setWidthHeight, #setWoterMark').prop('disabled', false);
+								});
+							}
 							removeDirWin.close();
-							$('#fileUploadFormButton, #setWidthHeight, #setWoterMark').prop('disabled', true);
-							$('#filemanagerContentFiles').html('<p class="empty center">Выберите раздел</p>');
-						});
+						}, pDir);
+						
 					} else {
 						notify('Ошибка удаления директории!', 'error');
 					}
@@ -657,6 +705,16 @@ $(document).ready(function() {
 		$('#filemanagerDirs').find('span').addClass('disabled');
 		$('#fileUploadForm').formSubmit({
 			url: 'filemanager/files_upload',
+			before: () => {
+				const filemanagerFormPath = $('#filemanagerFormPath').val();
+				if (!filemanagerFormPath) {
+					notify('Не выбрана директория для загрузки!', 'error');
+					$('#sectionWait').removeClass('visible filemanager');
+					$('#newFolder, #editFolder, #removeFolder, #fileUploadFormButton, #setWidthHeight').prop('disabled', false);
+					$("#fileUploadForm")[0].reset();
+					return false;
+				}
+			},
 			success: function(response) {
 				if (response == 2) {
 					console.log('2');
@@ -674,7 +732,7 @@ $(document).ready(function() {
 				var activeDirectory = $('#filemanagerDirs').find('[directory].active').last().attr('directory');
 				getAjaxHtml('filemanager/files_get', {directory: activeDirectory}, function(html) {
 					$('#filemanagerContentFiles').html(html);
-					$('#removeFiles, #replaceFiles, #newFolder, #editFolder, #removeFolder, #fileUploadFormButton, #setWidthHeight').prop('disabled', false);
+					$('#newFolder, #editFolder, #removeFolder, #fileUploadFormButton, #setWidthHeight').prop('disabled', false);
 					$('#filemanagerDirs').find('span').removeClass('disabled');
 					$('#sectionWait').removeClass('visible filemanager');
 					$("#fileUploadForm")[0].reset();

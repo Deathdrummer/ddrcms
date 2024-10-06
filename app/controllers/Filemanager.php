@@ -88,7 +88,7 @@ class Filemanager extends MY_Controller {
 		if (!mkdir($this->filesPath.$path.$dirName, 0777, true)) exit('0');
 		if (!mkdir($this->filesPath.$this->thumbsDir.'/'.$path.$dirName, 0777, true)) exit('0');
 		if (!mkdir($this->filesPath.$this->miniDir.'/'.$path.$dirName, 0777, true)) exit('0');
-		echo 1;
+		echo json_encode($dirName);
 	}
 	
 	

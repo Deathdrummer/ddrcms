@@ -1,6 +1,6 @@
 <tr>
 	<td>{{page_title}}</td>
-	<td>{{seo_url}}</td>
+	<td><a href="{{base_url(seo_url)}}" target="_blank" title="Перейти на страницу">{{seo_url}}</a></td>
 	{# <td class="center">{% if header %}<i class="fa fa-check"></i>{% endif %}</td>
 	<td class="center">{% if footer %}<i class="fa fa-check"></i>{% endif %}</td>
 	<td class="center">{% if nav_mobile %}<i class="fa fa-check"></i>{% endif %}</td> #}

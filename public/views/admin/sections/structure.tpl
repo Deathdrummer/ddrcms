@@ -81,7 +81,7 @@
 						{% for p in pages %}
 							<tr>
 								<td>{{p.page_title}}</td>
-								<td>{{p.seo_url}}</td>
+								<td><a href="{{base_url(p.seo_url)}}" target="_blank" title="Перейти на страницу">{{p.seo_url}}</a></td>
 								{# <td class="center">{% if p.header %}<i class="fa fa-check"></i>{% endif %}</td>
 								<td class="center">{% if p.footer %}<i class="fa fa-check"></i>{% endif %}</td>
 								<td class="center">{% if p.nav_mobile %}<i class="fa fa-check"></i>{% endif %}</td> #}

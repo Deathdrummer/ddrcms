@@ -5,7 +5,7 @@
 				{% if file.name|filename(2)|is_img_file %}
 					<img src="{{base_url('public/filemanager/__thumbs__/'~file.src|freshfile)}}" alt="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}" title="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}">
 				{% else %}
-					<img src="{{base_url('public/images/filetypes/'~file.src|filename(2))}}.png" alt="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}" title="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}">
+					<img src="{{images('public/images/filetypes/'~file.src|filename(2), 'filetypes/untiped.png')}}" alt="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}" title="{{file.name|filename(1)}} | файл {{file.name|filename(2)}}">
 				{% endif %}
 			</div>
 			<span>{{file.name}}</span>
