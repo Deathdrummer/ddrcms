@@ -13,7 +13,7 @@
 			</tr>
 			<tr>
 				<td colspan="2" class="text-left">
-					<div class="justify-content-start"><span>Код секции:</span></div>
+					<div class="justify-content-start"><span>Код секции</span></div>
 					<textarea name="code" id="hideCodeData" hidden>{{section_code}}</textarea>
 					<div class="h-80rem w-100 codelyout" id="codeSection">
 						<div class="codelyout__info codelyout__info-visible" id="codeSectionWait">

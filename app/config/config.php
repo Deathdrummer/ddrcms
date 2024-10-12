@@ -15,6 +15,19 @@ $config['patterns_files_names'] = [
 ];
 
 
+$config['lists_types'] = [
+    'list',
+    'catalog',
+    'categories',
+    'options',
+    'icons',
+    'hashtags',
+    'page',
+    'sections'
+];
+
+
+
 // карта для транслита
 $config['map'] = [
 	"\'"	=> "&#39;",

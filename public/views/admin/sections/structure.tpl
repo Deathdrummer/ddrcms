@@ -1021,7 +1021,7 @@ $(document).ready(function() {
 		ddrPopUp({
 			title: 'Редактировать секцию|4',
 			width: 1200,
-			buttons: [{id: 'sectionUpdate', title: 'Обновить'}],
+			buttons: [{id: 'sectionUpdate', title: 'Обновить'}, {id: 'sectionUpdateClose', title: 'Обновить и закрыть'}],
 			closeByButton: true,
 			close: 'Отмена'
 		}, function(updateSectionWin) {
@@ -1064,6 +1064,16 @@ $(document).ready(function() {
 				});
 				
 				$('#sectionUpdate').on(tapEvent, function() {
+					sectionUpdate();
+				});
+				
+				$('#sectionUpdateClose').on(tapEvent, function() {
+					sectionUpdate(true);
+				});
+				
+				
+				
+				function sectionUpdate(closeWin = false) {
 					$('#sectionForm').formSubmit({
 						url: 'admin/sections/update',
 						fields: {id: sectionId},
@@ -1079,11 +1089,13 @@ $(document).ready(function() {
 									$.post('/admin/list/remove_list', {list_id: listsToRemove}, function(response) {
 										if (response) {
 											notify('Секция успешно обновлена!');
-											updateSectionWin.close();
+											if (closeWin) updateSectionWin.close();
+											else updateSectionWin.wait(false);
 										}
 									}, 'json');
 								} else {
-									updateSectionWin.close();
+									if (closeWin) updateSectionWin.close();
+									else updateSectionWin.wait(false);
 								}			
 							} else {
 								notify('Ошибка! Секция не обновлена!', 'error');
@@ -1102,7 +1114,7 @@ $(document).ready(function() {
 							}
 						}	
 					});
-				});
+				}
 				
 				$(updateSectionWin.getSelector).off(tapEvent, '[copysectionvariable]').on(tapEvent, '[copysectionvariable]', function() {
 					const variabledata = $(this).closest('.row').find('[variablefield]').val();

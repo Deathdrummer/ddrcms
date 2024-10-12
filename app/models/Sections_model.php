@@ -256,18 +256,30 @@ class Sections_model extends MY_Model {
 		$this->db->where_in('param', $sectionsSettingsFields);
 		
 		if (!$sSFieldsResult = $this->_result('settings')) return false;
+
 		
 		foreach ($sSFieldsResult as $k => $row) {
 			$rowValues = json_decode($row['value'], true);
-			
+
 			if (!$rowValues) {
 				$sSFieldsResult[$k]['value'] = null;
 				continue;
 			}
 			
-			$newValues = array_filter($rowValues, function($key) use($fields) {
-				return in_array($key, $fields) ;
-			}, ARRAY_FILTER_USE_KEY);
+            # фильтруем списочные переменные
+            $listsTypes = $this->config->item('lists_types');
+            foreach ($listsTypes as $listType) {
+				if (!$listData = arrTakeItem($rowValues, $listType)) continue;
+                $newValues[$listType] = array_filter($listData, function($key) use($fields) {
+                    return in_array($key, $fields);
+                }, ARRAY_FILTER_USE_KEY);
+            }
+
+            # фильтруем просые переменные
+			if (!$rowValues) continue;
+            $newValues = array_merge($newValues, array_filter($rowValues, function($key) use($fields) {
+				return in_array($key, $fields);
+			}, ARRAY_FILTER_USE_KEY));
 			
 			$sSFieldsResult[$k]['value'] = $newValues ? json_encode($newValues, JSON_UNESCAPED_UNICODE) : null;
 		}
