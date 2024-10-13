@@ -1390,6 +1390,8 @@ class Admin extends MY_Controller {
 		$post = arrBringTypes($this->input->post());
 		$this->load->model('list_model', 'listsmodel');
 		
+		toLog($this->input->post());
+		
 		switch ($action) {
 			case 'get':
 				$data['fields'] = $this->listsmodel->listsGetFields($post['list_id']);
